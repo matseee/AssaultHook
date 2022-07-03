@@ -1,2 +1,2 @@
 # AssaultHook
-internal cheat that hooks the SwglSwapBuffers function from opengl.
+internal cheat that hooks the `wglSwapBuffers` function from opengl.
