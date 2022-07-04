@@ -16,6 +16,9 @@
     <Filter Include="memory">
       <UniqueIdentifier>{847859b9-5bc2-46eb-a054-7a1fc04739a7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="opengl">
+      <UniqueIdentifier>{165fc4e5-e6dc-4372-abb8-74e051bd0eee}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -33,6 +36,9 @@
     <ClInclude Include="AssaultCubeStructs.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="menu.h">
+      <Filter>opengl</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -46,6 +52,9 @@
     </ClCompile>
     <ClCompile Include="trampoline_hook.cpp">
       <Filter>memory</Filter>
+    </ClCompile>
+    <ClCompile Include="menu.cpp">
+      <Filter>opengl</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

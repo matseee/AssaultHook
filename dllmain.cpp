@@ -1,7 +1,10 @@
 #include "pch.h"
 #include "framework.h"
+#include "menu.h"
+
 #include "trampoline_hook.h"
 #include "memory.h"
+
 #include "AssaultCubeStructs.h"
 
 // Allocate and deallocate console
@@ -37,6 +40,35 @@ Entity* localPlayerEntity = nullptr;
 
 // entity list
 EnitityList* entityList = nullptr;
+
+// menu object
+Menu* menu = nullptr;
+
+// menu entries
+std::vector<MenuEntry> menuEntries = {
+    MenuEntry{ 
+         "Unl. Ammo",
+         false,
+         UnlAmmoHack,
+         nullptr,
+    },
+    MenuEntry{
+         "Unl. Health",
+         false,
+         UnlHealthHack,
+         nullptr,
+    },
+};
+
+
+
+bool UnlAmmoHack(bool active) {
+    return true;
+}
+
+bool UnlHealthHack(bool active) {
+    return true;
+}
 
 bool bUnlimitedHealth = false;
 bool bUnlimitedAmmo = false;
@@ -105,6 +137,9 @@ DWORD __stdcall Thread(HMODULE hModule) {
 
     AllocateConsole();
     std::cout << "Thread started" << std::endl;
+
+    // create menu
+    menu = new Menu("AssaultHook", menuEntries);
 
     // get handle to opengl module
     HMODULE hModuleOpenGL = GetModuleHandle(L"opengl32.dll");

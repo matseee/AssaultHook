@@ -140,12 +140,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="AssaultCubeStructs.h" />
+    <ClInclude Include="menu.h" />
     <ClInclude Include="trampoline_hook.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="memory.h" />
     <ClInclude Include="pch.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="menu.cpp" />
     <ClCompile Include="trampoline_hook.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="memory.cpp" />
