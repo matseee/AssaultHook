@@ -139,6 +139,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="AssaultCubeStructs.h" />
     <ClInclude Include="trampoline_hook.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="memory.h" />

@@ -36,6 +36,11 @@ uintptr_t memory::FindDMAAddress(uintptr_t ptr, std::vector<unsigned int> offset
 	for (unsigned int i = 0; i < offsets.size(); ++i)
 	{
 		addr = *(uintptr_t*)addr;
+
+		if (!addr) {
+			return addr;
+		}
+
 		addr += offsets[i];
 	}
 	return addr;
