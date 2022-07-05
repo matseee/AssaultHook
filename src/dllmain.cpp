@@ -53,8 +53,11 @@ void UnlAmmoHack() {
 
 void NoRecoil(bool active) {
     if (active) {
+        // instead of running the original calculateRecoil (?) function return directly
+        // ac_client.exe+C8BA0 - C2 0800               - ret 0008 { 8 }
         memory::Patch((BYTE*)(moduleBaseAddress + 0xC8BA0), (BYTE*)"\xC2\x08\x00", 3);
     } else {
+        // ac_client.exe+C8BA0 - 83 EC 28              - sub esp,28
         memory::Patch((BYTE*)(moduleBaseAddress + 0xC8BA0), (BYTE*)"\x83\xEC\x28", 3);
     }
 }
