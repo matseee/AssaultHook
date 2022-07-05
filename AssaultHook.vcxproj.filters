@@ -16,8 +16,17 @@
     <Filter Include="memory">
       <UniqueIdentifier>{847859b9-5bc2-46eb-a054-7a1fc04739a7}</UniqueIdentifier>
     </Filter>
-    <Filter Include="opengl">
+    <Filter Include="menu">
       <UniqueIdentifier>{165fc4e5-e6dc-4372-abb8-74e051bd0eee}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="opengl">
+      <UniqueIdentifier>{27d7debc-c09f-4cd7-8beb-d1cddf5f1f7c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="opengl\draw">
+      <UniqueIdentifier>{c08a03ee-a112-482f-830a-d3cda4ccceb5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="opengl\text">
+      <UniqueIdentifier>{4135bd8d-3555-43d7-9b8e-4890b4a88611}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -37,7 +46,13 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="menu.h">
-      <Filter>opengl</Filter>
+      <Filter>menu</Filter>
+    </ClInclude>
+    <ClInclude Include="openGLDraw.h">
+      <Filter>opengl\draw</Filter>
+    </ClInclude>
+    <ClInclude Include="openGLText.h">
+      <Filter>opengl\text</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -54,7 +69,13 @@
       <Filter>memory</Filter>
     </ClCompile>
     <ClCompile Include="menu.cpp">
-      <Filter>opengl</Filter>
+      <Filter>menu</Filter>
+    </ClCompile>
+    <ClCompile Include="openGLDraw.cpp">
+      <Filter>opengl\draw</Filter>
+    </ClCompile>
+    <ClCompile Include="openGLText.cpp">
+      <Filter>opengl\text</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

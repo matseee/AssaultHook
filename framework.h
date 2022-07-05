@@ -6,3 +6,6 @@
 #include <TlHelp32.h>
 #include <iostream>
 #include <vector>
+
+struct Vector2 { float x, y; };
+struct Vector3 { float x, y, z; };

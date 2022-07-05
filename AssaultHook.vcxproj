@@ -141,6 +141,8 @@
   <ItemGroup>
     <ClInclude Include="AssaultCubeStructs.h" />
     <ClInclude Include="menu.h" />
+    <ClInclude Include="openGLDraw.h" />
+    <ClInclude Include="openGLText.h" />
     <ClInclude Include="trampoline_hook.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="memory.h" />
@@ -148,6 +150,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="menu.cpp" />
+    <ClCompile Include="openGLDraw.cpp" />
+    <ClCompile Include="openGLText.cpp" />
     <ClCompile Include="trampoline_hook.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="memory.cpp" />

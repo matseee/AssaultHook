@@ -1,10 +1,12 @@
 #pragma once
+#include "openGLDraw.h"
+#include "openGLText.h"
 
 struct MenuEntry {
-	const char* Name;
-	bool Active;
-	bool (*OneTimeCallback)(bool);
-	bool (*Callback)(void);
+	const char* name;
+	bool active;
+	void (*oneTimeCallback)(bool);
+	void (*callback)(void);
 };
 
 class Menu
@@ -14,11 +16,14 @@ public:
 	void Tick();
 
 protected:
-	const char* Title;
+	openGLText::Font openGLFont;
 
-	std::vector<MenuEntry> Entries;
-	MenuEntry SelectedEntry;
-	int SelectedIndex;
+	const char* title;
+	bool isOpen;
+
+	std::vector<MenuEntry> entries;
+	MenuEntry selectedEntry;
+	int selectedIndex;
 
 	void Draw();
 };
