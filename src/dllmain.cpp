@@ -53,9 +53,9 @@ void UnlAmmoHack() {
 
 void NoRecoil(bool active) {
     if (active) {
-
+        memory::Patch((BYTE*)(moduleBaseAddress + 0xC8BA0), (BYTE*)"\xC2\x08\x00", 3);
     } else {
-
+        memory::Patch((BYTE*)(moduleBaseAddress + 0xC8BA0), (BYTE*)"\x83\xEC\x28", 3);
     }
 }
 

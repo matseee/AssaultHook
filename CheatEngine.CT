@@ -2,6 +2,59 @@
 <CheatTable CheatEngineTableVersion="42">
   <CheatEntries>
     <CheatEntry>
+      <ID>21</ID>
+      <Description>"LocalPlayerEntity"</Description>
+      <ShowAsHex>1</ShowAsHex>
+      <ShowAsSigned>0</ShowAsSigned>
+      <VariableType>4 Bytes</VariableType>
+      <Address>"ac_client.exe"+0x17E254</Address>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>3</ID>
+      <Description>"Health"</Description>
+      <ShowAsSigned>0</ShowAsSigned>
+      <VariableType>4 Bytes</VariableType>
+      <Address>"ac_client.exe"+0x17E254</Address>
+      <Offsets>
+        <Offset>EC</Offset>
+      </Offsets>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>31</ID>
+      <Description>"CurrentWeapon"</Description>
+      <ShowAsHex>1</ShowAsHex>
+      <ShowAsSigned>0</ShowAsSigned>
+      <VariableType>4 Bytes</VariableType>
+      <Address>"ac_client.exe"+0x17E254</Address>
+      <Offsets>
+        <Offset>364</Offset>
+      </Offsets>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>32</ID>
+      <Description>"Recoil1"</Description>
+      <ShowAsSigned>0</ShowAsSigned>
+      <VariableType>2 Bytes</VariableType>
+      <Address>"ac_client.exe"+0x17E254</Address>
+      <Offsets>
+        <Offset>60</Offset>
+        <Offset>C</Offset>
+        <Offset>364</Offset>
+      </Offsets>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>33</ID>
+      <Description>"Recoil2"</Description>
+      <ShowAsSigned>0</ShowAsSigned>
+      <VariableType>2 Bytes</VariableType>
+      <Address>"ac_client.exe"+0x17E254</Address>
+      <Offsets>
+        <Offset>62</Offset>
+        <Offset>C</Offset>
+        <Offset>364</Offset>
+      </Offsets>
+    </CheatEntry>
+    <CheatEntry>
       <ID>30</ID>
       <Description>"EntityList"</Description>
       <ShowAsHex>1</ShowAsHex>
@@ -10,33 +63,8 @@
       <Address>ac_client.exe+18AC04</Address>
     </CheatEntry>
     <CheatEntry>
-      <ID>20</ID>
-      <Description>"PlayerBase"</Description>
-      <ShowAsHex>1</ShowAsHex>
-      <ShowAsSigned>0</ShowAsSigned>
-      <VariableType>4 Bytes</VariableType>
-      <Address>"ac_client.exe"+0018AAB8</Address>
-      <Offsets>
-        <Offset>2C</Offset>
-        <Offset>4</Offset>
-        <Offset>20</Offset>
-      </Offsets>
-    </CheatEntry>
-    <CheatEntry>
-      <ID>3</ID>
-      <Description>"Health"</Description>
-      <VariableType>4 Bytes</VariableType>
-      <Address>"ac_client.exe"+0018AAB8</Address>
-      <Offsets>
-        <Offset>EC</Offset>
-        <Offset>2C</Offset>
-        <Offset>4</Offset>
-        <Offset>20</Offset>
-      </Offsets>
-    </CheatEntry>
-    <CheatEntry>
       <ID>18</ID>
-      <Description>"PrimaryAmmo"</Description>
+      <Description>"PrimaryAmmo ??"</Description>
       <ShowAsSigned>0</ShowAsSigned>
       <VariableType>4 Bytes</VariableType>
       <Address>ac_client.exe+17E0A8</Address>
@@ -47,18 +75,40 @@
       </Offsets>
     </CheatEntry>
     <CheatEntry>
-      <ID>21</ID>
-      <Description>"???"</Description>
+      <ID>34</ID>
+      <Description>"No description"</Description>
       <ShowAsSigned>0</ShowAsSigned>
-      <VariableType>4 Bytes</VariableType>
-      <Address>"ac_client.exe"+0x10f4f4</Address>
-      <Offsets>
-        <Offset>0</Offset>
-        <Offset>14</Offset>
-        <Offset>374</Offset>
-      </Offsets>
+      <VariableType>2 Bytes</VariableType>
+      <Address>ac_client.exe+C8E24</Address>
     </CheatEntry>
   </CheatEntries>
+  <CheatCodes>
+    <CodeEntry>
+      <Description>Change of call 004C8BA0</Description>
+      <AddressString>ac_client.exe+C705A</AddressString>
+      <Before>
+        <Byte>CB</Byte>
+        <Byte>FF</Byte>
+        <Byte>74</Byte>
+        <Byte>24</Byte>
+        <Byte>0C</Byte>
+      </Before>
+      <Actual>
+        <Byte>E8</Byte>
+        <Byte>41</Byte>
+        <Byte>1B</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+      </Actual>
+      <After>
+        <Byte>5B</Byte>
+        <Byte>C2</Byte>
+        <Byte>08</Byte>
+        <Byte>00</Byte>
+        <Byte>CC</Byte>
+      </After>
+    </CodeEntry>
+  </CheatCodes>
   <UserdefinedSymbols/>
   <Structures StructVersion="2">
     <Structure Name="unnamed structure" AutoFill="0" AutoCreate="1" DefaultHex="0" AutoDestroy="0" DoNotSaveLocal="0" RLECompression="1" AutoCreateStructsize="4096">
