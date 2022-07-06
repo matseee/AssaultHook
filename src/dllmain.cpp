@@ -94,7 +94,7 @@ void SnaplinesChangeCallback(bool active) {
 
 void AimbotChangeCallback(bool active) {
     if (active && !aimbot->IsInitialized()) {
-        aimbot->Initialize(localPlayer, entityList);
+        aimbot->Initialize(localPlayer, entityList, playerCount);
     }
 
     aimbot->SetEnabled(active);

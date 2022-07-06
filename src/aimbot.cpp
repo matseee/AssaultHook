@@ -1,9 +1,10 @@
 #include "pch.h"
 #include "aimbot.h"
 
-void Aimbot::Initialize(Entity* localPlayer, EnitityList* entityList) {
+void Aimbot::Initialize(Entity* localPlayer, EnitityList* entityList, int* playerCount) {
 	this->localPlayer = localPlayer;
 	this->entityList = entityList;
+	this->playerCount = playerCount;
 
 	this->isInitialized = true;
 }
@@ -31,17 +32,34 @@ bool Aimbot::IsInitialized() {
 }
 
 Entity* Aimbot::GetBestEntity() {
-	for (int i = 0; i < 12; i++) {
-		if (this->entityList && this->entityList->Entities[i]) {
-			Entity* entity = this->entityList->Entities[i];
+	float distance = 0;
+	float newDistance = 0;
 
-			if (entity->Health > 0) {
-				return entity;
+	Entity* entity = nullptr;
+
+	Vector3 localAngles;
+	localAngles.x = this->localPlayer->Angle.x;
+	localAngles.y = this->localPlayer->Angle.y;
+
+	for (int i = 0; i < *this->playerCount; i++) {
+		if (this->entityList && this->entityList->Entities[i]) {
+			Entity* maybeEntity = this->entityList->Entities[i];
+
+			if (maybeEntity->Health <= 0) {
+				continue;
+			}
+
+			Vector3 angle = this->CalcAngle(maybeEntity);
+			newDistance = localAngles.Distance(angle);
+
+			if (newDistance < distance || distance == 0) {
+				distance = newDistance;
+				entity = maybeEntity;
 			}
 		}
 	}
 
-	return nullptr;
+	return entity;
 }
 
 void Aimbot::AimToEntity(Entity* entity) {

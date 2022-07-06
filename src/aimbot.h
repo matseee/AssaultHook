@@ -4,7 +4,7 @@
 
 class Aimbot {
 public:
-	void Initialize(Entity* localPlayer, EnitityList* entityList);
+	void Initialize(Entity* localPlayer, EnitityList* entityList, int* playerCount);
 	void SetEnabled(bool enabled);
 
 	void Tick();
@@ -12,6 +12,8 @@ public:
 	bool IsInitialized();
 
 protected:
+	int* playerCount;
+
 	Entity* localPlayer;
 	EnitityList* entityList;
 
