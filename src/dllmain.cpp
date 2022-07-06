@@ -4,6 +4,7 @@
 
 #include "trampoline_hook.h"
 #include "memory.h"
+#include "aimbot.h"
 #include "esp.h"
 
 #include "AssaultCubeAddresses.h"
@@ -46,6 +47,7 @@ float* matrix = nullptr;
 Entity* localPlayer = nullptr;
 EnitityList* entityList = nullptr;
 
+Aimbot* aimbot = nullptr;
 ESP* esp = nullptr;
 
 void UnlHealthHackCallback() {
@@ -90,8 +92,20 @@ void SnaplinesChangeCallback(bool active) {
     esp->SetSnaplineActive(active);
 }
 
+void AimbotChangeCallback(bool active) {
+    if (active && !aimbot->IsInitialized()) {
+        aimbot->Initialize(localPlayer, entityList);
+    }
+
+    aimbot->SetEnabled(active);
+}
+
 void ESPTick() {
     esp->Tick();
+}
+
+void AimbotTick() {
+    aimbot->Tick();
 }
 
 // menu entries
@@ -101,6 +115,7 @@ std::vector<MenuEntry> menuEntries = {
     MenuEntry{ "No Recoil",     false, NoRecoilCallback,        nullptr,                nullptr },
     MenuEntry{ "ESP",           false, ESPChangeCallback,       nullptr,                ESPTick },
     MenuEntry{ "Snapline",      false, SnaplinesChangeCallback, nullptr,                nullptr },
+    MenuEntry{ "Aimbot",        false, AimbotChangeCallback,    nullptr,                AimbotTick },
 };
 
 BOOL __stdcall MainLoop(HDC hDc) {
@@ -149,6 +164,7 @@ DWORD __stdcall Thread(HMODULE hModule) {
 
     menu = new Menu("AssaultHook v1.0", menuEntries);
     esp = new ESP();
+    aimbot = new Aimbot();
 
     // get handle to opengl module
     HMODULE hModuleOpenGL = GetModuleHandle(L"opengl32.dll");

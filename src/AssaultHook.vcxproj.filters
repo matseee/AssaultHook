@@ -25,7 +25,7 @@
     <Filter Include="geomatry">
       <UniqueIdentifier>{a5d8a1e1-7b7f-4911-a53a-a5804e1fd44e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="hook">
+    <Filter Include="hacks">
       <UniqueIdentifier>{095122c7-4132-4b03-98c3-fb57aae4eca6}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -58,10 +58,13 @@
       <Filter>geomatry</Filter>
     </ClInclude>
     <ClInclude Include="esp.h">
-      <Filter>hook</Filter>
+      <Filter>hacks</Filter>
     </ClInclude>
     <ClInclude Include="AssaultCubeAddresses.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="aimbot.h">
+      <Filter>hacks</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -90,7 +93,10 @@
       <Filter>geomatry</Filter>
     </ClCompile>
     <ClCompile Include="esp.cpp">
-      <Filter>hook</Filter>
+      <Filter>hacks</Filter>
+    </ClCompile>
+    <ClCompile Include="aimbot.cpp">
+      <Filter>hacks</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -139,6 +139,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="aimbot.h" />
     <ClInclude Include="AssaultCubeAddresses.h" />
     <ClInclude Include="AssaultCubeStructs.h" />
     <ClInclude Include="esp.h" />
@@ -152,6 +153,7 @@
     <ClInclude Include="pch.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="aimbot.cpp" />
     <ClCompile Include="esp.cpp" />
     <ClCompile Include="geomatry.cpp" />
     <ClCompile Include="menu.cpp" />
