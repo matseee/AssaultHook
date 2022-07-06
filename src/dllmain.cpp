@@ -4,7 +4,9 @@
 
 #include "trampoline_hook.h"
 #include "memory.h"
+#include "esp.h"
 
+#include "AssaultCubeAddresses.h"
 #include "AssaultCubeStructs.h"
 
 // Allocate and deallocate console
@@ -35,77 +37,70 @@ Hook::TrampolineHook mainLoopHook = Hook::TrampolineHook();
 Menu* menu = nullptr;
 
 uintptr_t moduleBaseAddress = (uintptr_t)GetModuleHandle(L"ac_client.exe");
-Entity* localPlayerEntity = nullptr;
+Entity* localPlayer = nullptr;
 EnitityList* entityList = nullptr;
 
-void UnlHealthHack() {
-    if (localPlayerEntity) {
-        localPlayerEntity->Health = 999;
+ESP* esp = nullptr;
+
+void UnlHealthHackCallback() {
+    if (localPlayer) {
+        localPlayer->Health = 999;
+    } else {
+        localPlayer = *((Entity**)(moduleBaseAddress + ADDR_LOCAL_PLAYER_ENTITY));
     }
 }
 
-void UnlAmmoHack() {
-    int* pFirstWeaponAmmo = (int*)memory::FindDMAAddress(moduleBaseAddress + 0x17E0A8, { 0x364, 0x14, 0x0 });
+void UnlAmmoHackCallback() {
+    int* pFirstWeaponAmmo = (int*)memory::FindDMAAddress(moduleBaseAddress + ADDR_FIRST_WEAPON_AMMO, OFF_FIRST_WEAPON_AMMO);
     if (pFirstWeaponAmmo) {
-        *pFirstWeaponAmmo = 100;
+        *pFirstWeaponAmmo = 999;
     }
 }
 
-void NoRecoil(bool active) {
+void NoRecoilCallback(bool active) {
     if (active) {
         // instead of running the original calculateRecoil (?) function return directly
         // ac_client.exe+C8BA0 - C2 0800               - ret 0008 { 8 }
-        memory::Patch((BYTE*)(moduleBaseAddress + 0xC8BA0), (BYTE*)"\xC2\x08\x00", 3);
+        memory::Patch((BYTE*)(moduleBaseAddress + ADDR_NORECOIL_FUNCTION), (BYTE*)"\xC2\x08\x00", 3);
     } else {
         // ac_client.exe+C8BA0 - 83 EC 28              - sub esp,28
-        memory::Patch((BYTE*)(moduleBaseAddress + 0xC8BA0), (BYTE*)"\x83\xEC\x28", 3);
+        memory::Patch((BYTE*)(moduleBaseAddress + ADDR_NORECOIL_FUNCTION), (BYTE*)"\x83\xEC\x28", 3);
     }
+}
+
+int debugOutputCounter = 0;
+
+void ESPChangeCallback(bool active) {
+    if (active) {
+        float* matrix = (float*)(ADDR_MATRIX);
+
+        esp->Initialize(localPlayer, entityList, matrix);
+        esp->Activate();
+    } else {
+        esp->Deactivate();
+    }
+}
+
+void ESPCallback() {
+    esp->Tick();
 }
 
 // menu entries
 std::vector<MenuEntry> menuEntries = {
-    MenuEntry{
-         "Unl. Health",
-         false,
-         nullptr,
-         UnlHealthHack,
-    },
-    MenuEntry{ 
-         "Unl. Ammo",
-         false,
-         nullptr,
-         UnlAmmoHack,
-    },
-    MenuEntry{
-         "No Recoil",
-         false,
-         NoRecoil,
-         nullptr,
-    },
+    MenuEntry{ "Unl. Health", false, nullptr, UnlHealthHackCallback },
+    MenuEntry{ "Unl. Ammo", false, nullptr, UnlAmmoHackCallback },
+    MenuEntry{ "No Recoil", false, NoRecoilCallback, nullptr },
+    MenuEntry{ "ESP", false, ESPChangeCallback, ESPCallback },
 };
 
 BOOL __stdcall MainLoop(HDC hDc) {
-    if (!localPlayerEntity) {
-        localPlayerEntity = (Entity*)memory::FindDMAAddress(moduleBaseAddress + 0x17E254, { 0x0 });
+    if (!localPlayer) {
+        localPlayer = *((Entity**)(moduleBaseAddress + ADDR_LOCAL_PLAYER_ENTITY));
     }
 
-    if (localPlayerEntity) {
-        std::cout << "Player Position: (x:"<< localPlayerEntity->Position.x << ", y:" << localPlayerEntity->Position.y << ", z:" << localPlayerEntity->Position.z << ")" << std::endl;
+    if (!entityList) {
+        entityList = *(EnitityList**)(moduleBaseAddress + ADDR_ENTITY_LIST);
     }
-
-    //if (!entityList) {
-    //    entityList = (EnitityList*)memory::FindDMAAddress(moduleBaseAddress + 0x18AC04, { 0x0 });
-    //}
-
-    //if (entityList) {
-    //    for (int i = 1; i < 32; i++) {
-    //        if (entityList->Entities[i] && entityList->Entities[i]->VTable == 0x0054D07C) {
-    //            std::cout << "Player " << entityList->Entities[i]->Name << ": (x:" << entityList->Entities[i]->Position.x << ", y : " << entityList->Entities[i]->Position.y << ", z : " << entityList->Entities[i]->Position.z << ")" << std::endl;
-    //        } else {
-    //            break;
-    //        }
-    //    }
-    //}
 
     // create menu tick
     menu->Tick();
@@ -131,6 +126,7 @@ DWORD __stdcall Thread(HMODULE hModule) {
     std::cout << "Thread started" << std::endl;
 
     menu = new Menu("AssaultHook v1.0", menuEntries);
+    esp = new ESP();
 
     // get handle to opengl module
     HMODULE hModuleOpenGL = GetModuleHandle(L"opengl32.dll");
@@ -150,7 +146,6 @@ DWORD __stdcall Thread(HMODULE hModule) {
 
     return 0;
 }
-
 
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD  dwReasonForCall, LPVOID lpReserved) {
     if (dwReasonForCall == DLL_PROCESS_ATTACH) {

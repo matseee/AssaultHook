@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <gl\GL.h>
 #include "framework.h"
+#include "geomatry.h"
 
 namespace openGLText
 {

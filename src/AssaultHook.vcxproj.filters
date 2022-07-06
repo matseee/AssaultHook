@@ -22,11 +22,11 @@
     <Filter Include="opengl">
       <UniqueIdentifier>{27d7debc-c09f-4cd7-8beb-d1cddf5f1f7c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="opengl\draw">
-      <UniqueIdentifier>{c08a03ee-a112-482f-830a-d3cda4ccceb5}</UniqueIdentifier>
+    <Filter Include="geomatry">
+      <UniqueIdentifier>{a5d8a1e1-7b7f-4911-a53a-a5804e1fd44e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="opengl\text">
-      <UniqueIdentifier>{4135bd8d-3555-43d7-9b8e-4890b4a88611}</UniqueIdentifier>
+    <Filter Include="hook">
+      <UniqueIdentifier>{095122c7-4132-4b03-98c3-fb57aae4eca6}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -48,11 +48,20 @@
     <ClInclude Include="menu.h">
       <Filter>menu</Filter>
     </ClInclude>
-    <ClInclude Include="openGLDraw.h">
-      <Filter>opengl\draw</Filter>
-    </ClInclude>
     <ClInclude Include="openGLText.h">
-      <Filter>opengl\text</Filter>
+      <Filter>opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="openGLDraw.h">
+      <Filter>opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="geomatry.h">
+      <Filter>geomatry</Filter>
+    </ClInclude>
+    <ClInclude Include="esp.h">
+      <Filter>hook</Filter>
+    </ClInclude>
+    <ClInclude Include="AssaultCubeAddresses.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -71,11 +80,17 @@
     <ClCompile Include="menu.cpp">
       <Filter>menu</Filter>
     </ClCompile>
-    <ClCompile Include="openGLDraw.cpp">
-      <Filter>opengl\draw</Filter>
-    </ClCompile>
     <ClCompile Include="openGLText.cpp">
-      <Filter>opengl\text</Filter>
+      <Filter>opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="openGLDraw.cpp">
+      <Filter>opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="geomatry.cpp">
+      <Filter>geomatry</Filter>
+    </ClCompile>
+    <ClCompile Include="esp.cpp">
+      <Filter>hook</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
