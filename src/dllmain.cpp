@@ -38,6 +38,9 @@ Menu* menu = nullptr;
 
 uintptr_t moduleBaseAddress = (uintptr_t)GetModuleHandle(L"ac_client.exe");
 
+int* gameMode = nullptr;
+int* playerCount = nullptr;
+
 float* matrix = nullptr;
 
 Entity* localPlayer = nullptr;
@@ -73,7 +76,7 @@ void NoRecoilCallback(bool active) {
 
 void ESPChangeCallback(bool active) {
     if (active && !esp->IsInitialized()) {
-        esp->Initialize(localPlayer, entityList, matrix);
+        esp->Initialize(localPlayer, entityList, matrix, gameMode, playerCount);
     }
 
     esp->SetBoxActive(active);
@@ -81,7 +84,7 @@ void ESPChangeCallback(bool active) {
 
 void SnaplinesChangeCallback(bool active) {
     if (active && !esp->IsInitialized()) {
-        esp->Initialize(localPlayer, entityList, matrix);
+        esp->Initialize(localPlayer, entityList, matrix, gameMode, playerCount);
     }
 
     esp->SetSnaplineActive(active);
@@ -101,6 +104,14 @@ std::vector<MenuEntry> menuEntries = {
 };
 
 BOOL __stdcall MainLoop(HDC hDc) {
+    if (!gameMode) {
+        gameMode = (int*)(moduleBaseAddress + ADDR_GAME_MODE);
+    }
+
+    if (!playerCount) {
+        playerCount = (int*)(moduleBaseAddress + ADDR_NUM_PLAYERS);
+    }
+
     if (!matrix) {
         matrix = (float*)(ADDR_MATRIX);
     }

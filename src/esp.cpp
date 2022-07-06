@@ -8,7 +8,7 @@ void ESP::Tick() {
 
 	glGetIntegerv(GL_VIEWPORT, this->viewport);
 
-	for (int i = 0; i < 12; i++) {
+	for (int i = 0; i < *this->playerCount; i++) {
 		if (this->IsValidEntity(this->entityList->Entities[i])) {
 			Entity* entity = this->entityList->Entities[i];
 
@@ -23,7 +23,7 @@ void ESP::Tick() {
 				}
 
 				if (this->isSnaplineActive) {
-					this->DrawEntitySnapline(screenCoordinates);
+					this->DrawEntitySnapline(entity, screenCoordinates);
 				}
 			}
 		}
@@ -37,7 +37,11 @@ void ESP::DrawEntityBox(Entity* entity, Vector3 screenCoordinates) {
 		this->openGLFont.Build(ESP_FONT_HEIGHT);
 	}
 
-	const GLubyte* color = rgb::red;
+	const GLubyte* color = rgb::blue;
+
+	if (!this->IsTeamGame() || this->IsEnemy(entity)) {
+		color = rgb::red;
+	}
 
 	float dist = localPlayer->Position.Distance(entity->Position);
 
@@ -54,8 +58,12 @@ void ESP::DrawEntityBox(Entity* entity, Vector3 screenCoordinates) {
 	this->openGLFont.Print(textX, textY, color, "%s", entity->Name);
 }
 
-void ESP::DrawEntitySnapline(Vector3 screenCoordinates) {
-	const GLubyte* color = rgb::red;
+void ESP::DrawEntitySnapline(Entity* entity, Vector3 screenCoordinates) {
+	const GLubyte* color = rgb::blue;
+
+	if (!this->IsTeamGame() || this->IsEnemy(entity)) {
+		color = rgb::red;
+	}
 
 	Vector2 v2ScreenCoordinates;
 	v2ScreenCoordinates.x = screenCoordinates.x;
@@ -68,10 +76,12 @@ void ESP::DrawEntitySnapline(Vector3 screenCoordinates) {
 	openGLDraw::DrawLine(v2PlayerCoordinates, v2ScreenCoordinates, color);
 }
 
-void ESP::Initialize(Entity* localPlayer, EnitityList* entityList, float* matrix) {
+void ESP::Initialize(Entity* localPlayer, EnitityList* entityList, float* matrix, int* gameMode, int* playerCount) {
 	this->localPlayer = localPlayer;
 	this->entityList = entityList;
 	this->matrix = matrix;
+	this->gameMode = gameMode;
+	this->playerCount = playerCount;
 }
 
 void ESP::SetBoxActive(bool active) {
@@ -87,18 +97,16 @@ bool ESP::IsInitialized() {
 }
 
 bool ESP::IsTeamGame() {
-	return false;
-	//return *gameMode == 0 || *gameMode == 4 
-	//	|| *gameMode == 5 || *gameMode == 7 
-	//	|| *gameMode == 11 || *gameMode == 13 
-	//	|| *gameMode == 14 || *gameMode == 16 
-	//	|| *gameMode == 17 || *gameMode == 20 
-	//	|| *gameMode == 21;
+	return *gameMode == 0 || *gameMode == 4 
+		|| *gameMode == 5 || *gameMode == 7 
+		|| *gameMode == 11 || *gameMode == 13 
+		|| *gameMode == 14 || *gameMode == 16 
+		|| *gameMode == 17 || *gameMode == 20 
+		|| *gameMode == 21;
 }
 
 bool ESP::IsEnemy(Entity* entity) {
-	// TODO
-	return false;
+	return entity->Team != this->localPlayer->Team;
 }
 
 bool ESP::IsValidEntity(Entity* entity) {

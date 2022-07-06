@@ -13,6 +13,7 @@ namespace rgb {
 
 	const GLubyte red[3] = { 255,0,0 };
 	const GLubyte green[3] = { 0,255,0 };
+	const GLubyte blue[3] = { 0, 0, 255 };
 }
 
 namespace openGLDraw {

@@ -17,7 +17,7 @@ const int ESP_FONT_WIDTH = 9;
 
 class ESP {
 public:
-	void Initialize(Entity* localPlayer, EnitityList* entityList, float* matrix);
+	void Initialize(Entity* localPlayer, EnitityList* entityList, float* matrix, int* gameMode, int* playerCount);
 
 	void SetBoxActive(bool active);
 	void SetSnaplineActive(bool active);
@@ -33,8 +33,8 @@ protected:
 
 	int viewport[4];
 	
-	// int* gameMode = (int*)(ADDR_GAME_MODE);
-	// int* numberOfPlayers = (int*)(ADDR_NUM_PLAYERS);
+	int* gameMode = nullptr;
+	int* playerCount = nullptr;
 	float* matrix = nullptr;
 
 	Entity* localPlayer = nullptr;
@@ -47,6 +47,6 @@ protected:
 	bool IsValidEntity(Entity* entity);
 
 	void DrawEntityBox(Entity* entity, Vector3 screen);
-	void DrawEntitySnapline(Vector3 screenCordinates);
+	void DrawEntitySnapline(Entity* entity, Vector3 screenCordinates);
 };
 

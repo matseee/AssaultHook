@@ -76,50 +76,23 @@
     </CheatEntry>
     <CheatEntry>
       <ID>34</ID>
-      <Description>"No description"</Description>
-      <ShowAsHex>1</ShowAsHex>
+      <Description>"GameMode"</Description>
+      <ShowAsSigned>0</ShowAsSigned>
       <VariableType>4 Bytes</VariableType>
-      <Address>ac_client.exe+18AC00</Address>
+      <Address>ac_client.exe+18ABF8</Address>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>36</ID>
+      <Description>"PlayerCount"</Description>
+      <VariableType>4 Bytes</VariableType>
+      <Address>ac_client.exe+18AC0C</Address>
     </CheatEntry>
     <CheatEntry>
       <ID>35</ID>
       <Description>"No description"</Description>
       <ShowAsSigned>0</ShowAsSigned>
-      <VariableType>4 Bytes</VariableType>
-      <Address>0057E050</Address>
-    </CheatEntry>
-    <CheatEntry>
-      <ID>36</ID>
-      <Description>"No description"</Description>
-      <ShowAsSigned>0</ShowAsSigned>
       <VariableType>Float</VariableType>
-      <Address>ac_client.exe+17DF8B</Address>
-    </CheatEntry>
-    <CheatEntry>
-      <ID>37</ID>
-      <Description>"No description"</Description>
-      <VariableType>Float</VariableType>
-      <Address>ac_client.exe+192078</Address>
-    </CheatEntry>
-    <CheatEntry>
-      <ID>38</ID>
-      <Description>"No description"</Description>
-      <ShowAsSigned>0</ShowAsSigned>
-      <VariableType>Float</VariableType>
-      <Address>0057DF7C + 14</Address>
-    </CheatEntry>
-    <CheatEntry>
-      <ID>39</ID>
-      <Description>"No description"</Description>
-      <ShowAsSigned>0</ShowAsSigned>
-      <VariableType>Float</VariableType>
-      <Address>ac_client.exe+17DFFC</Address>
-    </CheatEntry>
-    <CheatEntry>
-      <ID>40</ID>
-      <Description>"No description"</Description>
-      <VariableType>Float</VariableType>
-      <Address>ac_client.exe+17DFFC</Address>
+      <Address>0057DFD0</Address>
     </CheatEntry>
   </CheatEntries>
   <CheatCodes>
