@@ -18,6 +18,8 @@ void Menu::Tick() {
 		this->isOpen = !this->isOpen;
 	}
 
+	openGLDraw::SetupOrtho();
+
 	if (this->isOpen) {
 		if (GetAsyncKeyState(VK_UP) & 1) {
 			if (this->selectedIndex > 0) {
@@ -57,6 +59,8 @@ void Menu::Tick() {
 			entry.callback();
 		}
 	}
+
+	openGLDraw::RestoreGL();
 }
 
 void Menu::Draw() {
@@ -72,7 +76,6 @@ void Menu::Draw() {
 		this->openGLFont.Build(FONT_HEIGHT);
 	}
 
-	openGLDraw::SetupOrtho();
 	openGLDraw::DrawFilledRect(posX, posY, menuWidth, menuHeight, rgb::black);
 
 	this->openGLFont.Print(this->openGLFont.centerText(posX, menuWidth, strlen(this->title) * FONT_WIDTH), currentPosY, rgb::white, "%s", this->title);
@@ -96,6 +99,4 @@ void Menu::Draw() {
 			this->openGLFont.Print(this->openGLFont.endText(posX, menuWidth, strlen("OFF") * FONT_WIDTH), currentPosY, rgb::red, "%s", "OFF");
 		}
 	}
-
-	openGLDraw::RestoreGL();
 }

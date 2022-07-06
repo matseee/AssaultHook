@@ -68,8 +68,6 @@ void NoRecoilCallback(bool active) {
     }
 }
 
-int debugOutputCounter = 0;
-
 void ESPChangeCallback(bool active) {
     if (active) {
         float* matrix = (float*)(ADDR_MATRIX);

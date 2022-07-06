@@ -78,5 +78,6 @@ bool ESP::IsEnemy(Entity* entity) {
 }
 
 bool ESP::IsValidEntity(Entity* entity) {
-	return entity && entity->VTable == VAL_ENTITY_VTABLE_COMPARE;
+	return entity && entity->VTable == VAL_ENTITY_VTABLE_COMPARE
+		&& entity->Health > 0;
 }
