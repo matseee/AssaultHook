@@ -19,12 +19,17 @@ class ESP {
 public:
 	void Initialize(Entity* localPlayer, EnitityList* entityList, float* matrix);
 
-	void Activate();
-	void Deactivate();
+	void SetBoxActive(bool active);
+	void SetSnaplineActive(bool active);
+
+	bool IsInitialized();
 
 	void Tick();
 protected:
-	bool isActive = false;
+	bool isInitialized = false;
+
+	bool isBoxActive = false;
+	bool isSnaplineActive = false;
 
 	int viewport[4];
 	
@@ -41,6 +46,7 @@ protected:
 	bool IsEnemy(Entity* entity);
 	bool IsValidEntity(Entity* entity);
 
-	void DrawEntity(Entity* entity, Vector3 screen);
+	void DrawEntityBox(Entity* entity, Vector3 screen);
+	void DrawEntitySnapline(Vector3 screenCordinates);
 };
 

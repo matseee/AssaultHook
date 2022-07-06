@@ -2,11 +2,11 @@
 #include "esp.h"
 
 void ESP::Tick() {
-	if (!this->isActive || !this->entityList || !this->entityList->Entities) {
+	if (!this->entityList || !this->entityList->Entities) {
 		return;
 	}
 
-	glGetIntegerv(GL_VIEWPORT, viewport);
+	glGetIntegerv(GL_VIEWPORT, this->viewport);
 
 	for (int i = 0; i < 12; i++) {
 		if (this->IsValidEntity(this->entityList->Entities[i])) {
@@ -15,16 +15,22 @@ void ESP::Tick() {
 			Vector3 entityCenter = entity->PositionHead;
 			entityCenter.z = (entity->PositionHead.z + entity->Position.z) / 2;
 
-			Vector3 screenCordinates;
+			Vector3 screenCoordinates;
 
-			if (WorldToScreen(entityCenter, screenCordinates, matrix, viewport[2], viewport[3])) {
-				this->DrawEntity(entity, screenCordinates);
+			if (WorldToScreen(entityCenter, screenCoordinates, matrix, this->viewport[2], this->viewport[3])) {
+				if (this->isBoxActive) {
+					this->DrawEntityBox(entity, screenCoordinates);
+				}
+
+				if (this->isSnaplineActive) {
+					this->DrawEntitySnapline(screenCoordinates);
+				}
 			}
 		}
 	}
 }
 
-void ESP::DrawEntity(Entity* entity, Vector3 screen) {
+void ESP::DrawEntityBox(Entity* entity, Vector3 screenCoordinates) {
 	HDC currentHDC = wglGetCurrentDC();
 
 	if (!this->openGLFont.bBuilt || currentHDC != this->openGLFont.hdc) {
@@ -35,9 +41,9 @@ void ESP::DrawEntity(Entity* entity, Vector3 screen) {
 
 	float dist = localPlayer->Position.Distance(entity->Position);
 
-	float scale = (GAME_UNIT_MAGIC / dist) * (viewport[2] / VIRTUAL_SCREEN_WIDTH);
-	float x = screen.x - scale;
-	float y = screen.y - scale * PLAYER_ASPECT_RATIO;
+	float scale = (GAME_UNIT_MAGIC / dist) * (this->viewport[2] / VIRTUAL_SCREEN_WIDTH);
+	float x = screenCoordinates.x - scale;
+	float y = screenCoordinates.y - scale * PLAYER_ASPECT_RATIO;
 	float width = scale * 2;
 	float height = scale * PLAYER_ASPECT_RATIO * 2;
 
@@ -48,18 +54,36 @@ void ESP::DrawEntity(Entity* entity, Vector3 screen) {
 	this->openGLFont.Print(textX, textY, color, "%s", entity->Name);
 }
 
+void ESP::DrawEntitySnapline(Vector3 screenCoordinates) {
+	const GLubyte* color = rgb::red;
+
+	Vector2 v2ScreenCoordinates;
+	v2ScreenCoordinates.x = screenCoordinates.x;
+	v2ScreenCoordinates.y = screenCoordinates.y;
+
+	Vector2 v2PlayerCoordinates;
+	v2PlayerCoordinates.y = this->viewport[3];
+	v2PlayerCoordinates.x = this->viewport[2] / 2;
+
+	openGLDraw::DrawLine(v2PlayerCoordinates, v2ScreenCoordinates, color);
+}
+
 void ESP::Initialize(Entity* localPlayer, EnitityList* entityList, float* matrix) {
 	this->localPlayer = localPlayer;
 	this->entityList = entityList;
 	this->matrix = matrix;
 }
 
-void ESP::Activate() {
-	this->isActive = true;
+void ESP::SetBoxActive(bool active) {
+	this->isBoxActive = active;
 }
 
-void ESP::Deactivate() {
-	this->isActive = false;
+void ESP::SetSnaplineActive(bool active) {
+	this->isSnaplineActive = active;
+}
+
+bool ESP::IsInitialized() {
+	return this->isInitialized;
 }
 
 bool ESP::IsTeamGame() {

@@ -20,6 +20,14 @@ void openGLDraw::RestoreGL() {
 	glPopAttrib();
 }
 
+void openGLDraw::DrawLine(Vector2 a, Vector2 b, const GLubyte color[3]) {
+	glColor3ub(color[0], color[1], color[2]);
+	glBegin(GL_LINES);
+	glVertex2f(a.x, a.y);
+	glVertex2f(b.x, b.y);
+	glEnd();
+}
+
 void openGLDraw::DrawFilledRect(float x, float y, float width, float height, const GLubyte color[3]) {
 	glColor3ub(color[0], color[1], color[2]);
 	glBegin(GL_QUADS);

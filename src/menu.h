@@ -5,8 +5,9 @@
 struct MenuEntry {
 	const char* name;
 	bool active;
-	void (*oneTimeCallback)(bool);
-	void (*callback)(void);
+	void (*toggleCallback)(bool);
+	void (*activeCallback)(void);
+	void (*tickCallback)(void);
 };
 
 class Menu

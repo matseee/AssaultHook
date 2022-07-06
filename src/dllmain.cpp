@@ -37,6 +37,9 @@ Hook::TrampolineHook mainLoopHook = Hook::TrampolineHook();
 Menu* menu = nullptr;
 
 uintptr_t moduleBaseAddress = (uintptr_t)GetModuleHandle(L"ac_client.exe");
+
+float* matrix = nullptr;
+
 Entity* localPlayer = nullptr;
 EnitityList* entityList = nullptr;
 
@@ -69,29 +72,39 @@ void NoRecoilCallback(bool active) {
 }
 
 void ESPChangeCallback(bool active) {
-    if (active) {
-        float* matrix = (float*)(ADDR_MATRIX);
-
+    if (active && !esp->IsInitialized()) {
         esp->Initialize(localPlayer, entityList, matrix);
-        esp->Activate();
-    } else {
-        esp->Deactivate();
     }
+
+    esp->SetBoxActive(active);
 }
 
-void ESPCallback() {
+void SnaplinesChangeCallback(bool active) {
+    if (active && !esp->IsInitialized()) {
+        esp->Initialize(localPlayer, entityList, matrix);
+    }
+
+    esp->SetSnaplineActive(active);
+}
+
+void ESPTick() {
     esp->Tick();
 }
 
 // menu entries
 std::vector<MenuEntry> menuEntries = {
-    MenuEntry{ "Unl. Health", false, nullptr, UnlHealthHackCallback },
-    MenuEntry{ "Unl. Ammo", false, nullptr, UnlAmmoHackCallback },
-    MenuEntry{ "No Recoil", false, NoRecoilCallback, nullptr },
-    MenuEntry{ "ESP", false, ESPChangeCallback, ESPCallback },
+    MenuEntry{ "Unl. Health",   false, nullptr,                 UnlHealthHackCallback,  nullptr },
+    MenuEntry{ "Unl. Ammo",     false, nullptr,                 UnlAmmoHackCallback,    nullptr },
+    MenuEntry{ "No Recoil",     false, NoRecoilCallback,        nullptr,                nullptr },
+    MenuEntry{ "ESP",           false, ESPChangeCallback,       nullptr,                ESPTick },
+    MenuEntry{ "Snapline",      false, SnaplinesChangeCallback, nullptr,                nullptr },
 };
 
 BOOL __stdcall MainLoop(HDC hDc) {
+    if (!matrix) {
+        matrix = (float*)(ADDR_MATRIX);
+    }
+
     if (!localPlayer) {
         localPlayer = *((Entity**)(moduleBaseAddress + ADDR_LOCAL_PLAYER_ENTITY));
     }

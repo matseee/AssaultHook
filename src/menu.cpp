@@ -37,15 +37,15 @@ void Menu::Tick() {
 
 		if (GetAsyncKeyState(VK_LEFT) & 1 && this->selectedEntry.active) {
 			this->entries[this->selectedIndex].active = false;
-			if (this->entries[this->selectedIndex].oneTimeCallback) {
-				this->entries[this->selectedIndex].oneTimeCallback(false);
+			if (this->entries[this->selectedIndex].toggleCallback) {
+				this->entries[this->selectedIndex].toggleCallback(false);
 			}
 		}
 
 		if (GetAsyncKeyState(VK_RIGHT) & 1 && !this->selectedEntry.active) {
 			this->entries[this->selectedIndex].active = true;
-			if (this->entries[this->selectedIndex].oneTimeCallback) {
-				this->entries[this->selectedIndex].oneTimeCallback(true);
+			if (this->entries[this->selectedIndex].toggleCallback) {
+				this->entries[this->selectedIndex].toggleCallback(true);
 			}
 		}
 
@@ -55,8 +55,12 @@ void Menu::Tick() {
 	// always call the entry-callbacks, even if the menu is closed
 	for (int i = 0; i < (int)this->entries.size(); ++i) {
 		MenuEntry entry = this->entries[i];
-		if (entry.active && entry.callback) {
-			entry.callback();
+		if (entry.active && entry.activeCallback && !entry.tickCallback) {
+			entry.activeCallback();
+		}
+
+		if (entry.tickCallback) {
+			entry.tickCallback();
 		}
 	}
 
