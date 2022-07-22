@@ -40,7 +40,7 @@ public:
 	Vector3 PositionHead; //0x0004
 	char pad_0010[24]; //0x0010
 	Vector3 Position; //0x0028
-	Vector3 Angle; //0x0034
+	Vector2 Angle; //0x0034
 	char pad_003C[40]; //0x003C
 	uint8_t N0000021C; //0x0064
 	uint8_t N0000021E; //0x0065
