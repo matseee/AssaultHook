@@ -10,19 +10,6 @@
 #include "AssaultCubeAddresses.h"
 #include "AssaultCubeStructs.h"
 
-// Allocate and deallocate console
-FILE* fpConsoleOutput;
-
-void AllocateConsole() {
-    AllocConsole();
-    freopen_s(&fpConsoleOutput, "CONOUT$", "w", stdout);
-}
-
-void DeallocateConsole() {
-    fclose(fpConsoleOutput);
-    FreeConsole();
-}
-
 // hmodule for the created thread
 HMODULE hThread = nullptr;                                              
 
@@ -37,19 +24,22 @@ Hook::TrampolineHook mainLoopHook = Hook::TrampolineHook();
 // opengl ingame menu
 Menu* menu = nullptr;
 
+// ac_client.exe base address
 uintptr_t moduleBaseAddress = (uintptr_t)GetModuleHandle(L"ac_client.exe");
 
+// ac_client.exe pointers
 int* gameMode = nullptr;
 int* playerCount = nullptr;
-
 float* matrix = nullptr;
 
 Entity* localPlayer = nullptr;
 EnitityList* entityList = nullptr;
 
+// game hacking objetcs
 Aimbot* aimbot = nullptr;
 ESP* esp = nullptr;
 
+// hacking menu callbacks
 void UnlHealthHackCallback() {
     if (localPlayer) {
         localPlayer->Health = 999;
@@ -100,6 +90,7 @@ void AimbotChangeCallback(bool active) {
     aimbot->SetEnabled(active);
 }
 
+// hacking tick callbacks (every rendering tick of opengl)
 void ESPTick() {
     esp->Tick();
 }
@@ -118,37 +109,18 @@ std::vector<MenuEntry> menuEntries = {
     MenuEntry{ "Aimbot",        false, AimbotChangeCallback,    nullptr,                AimbotTick },
 };
 
+// hacking loop that is hooked into the opengl wglSwapBuffers function
 BOOL __stdcall MainLoop(HDC hDc) {
-    if (!gameMode) {
-        gameMode = (int*)(moduleBaseAddress + ADDR_GAME_MODE);
-    }
-
-    if (!playerCount) {
-        playerCount = (int*)(moduleBaseAddress + ADDR_NUM_PLAYERS);
-    }
-
-    if (!matrix) {
-        matrix = (float*)(ADDR_MATRIX);
-    }
-
-    if (!localPlayer) {
-        localPlayer = *((Entity**)(moduleBaseAddress + ADDR_LOCAL_PLAYER_ENTITY));
-    }
-
-    if (!entityList) {
-        entityList = *(EnitityList**)(moduleBaseAddress + ADDR_ENTITY_LIST);
-    }
+    if (!gameMode) { gameMode = (int*)(moduleBaseAddress + ADDR_GAME_MODE); }
+    if (!playerCount) { playerCount = (int*)(moduleBaseAddress + ADDR_NUM_PLAYERS); }
+    if (!matrix) { matrix = (float*)(ADDR_MATRIX); }
+    if (!localPlayer) { localPlayer = *((Entity**)(moduleBaseAddress + ADDR_LOCAL_PLAYER_ENTITY)); }
+    if (!entityList) { entityList = *(EnitityList**)(moduleBaseAddress + ADDR_ENTITY_LIST); }
 
     // create menu tick
     menu->Tick();
 
     if (GetAsyncKeyState(VK_DELETE) & 1) {
-        std::cout << "Exit cheat in 15 seconds ..." << std::endl;
-        Sleep(15000);
-
-        // deactivate console
-        DeallocateConsole();
-
         mainLoopHook.Disable();
         FreeLibraryAndExitThread((HINSTANCE)hThread, 1);
     }
@@ -156,11 +128,9 @@ BOOL __stdcall MainLoop(HDC hDc) {
     return originalWglSwapBuffers(hDc);
 }
 
+// thread that creates the game hacking instances and hooks the opengl wglSawpBuffers function
 DWORD __stdcall Thread(HMODULE hModule) {
     hThread = hModule;
-
-    AllocateConsole();
-    std::cout << "Thread started" << std::endl;
 
     menu = new Menu("AssaultHook v1.0", menuEntries);
     esp = new ESP();
@@ -185,6 +155,7 @@ DWORD __stdcall Thread(HMODULE hModule) {
     return 0;
 }
 
+// entry point of the dll that creates a new thread
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD  dwReasonForCall, LPVOID lpReserved) {
     if (dwReasonForCall == DLL_PROCESS_ATTACH) {
         HANDLE hTread = CreateThread(nullptr, 0, (LPTHREAD_START_ROUTINE)Thread, hModule, 0, nullptr);

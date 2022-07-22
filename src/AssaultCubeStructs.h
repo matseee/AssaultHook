@@ -3,8 +3,7 @@
 #include "framework.h"
 #include "geomatry.h"
 
-enum GameTypes
-{
+enum GameTypes {
 	TEAMDEATHMATCH = 0,
 	COOPEDIT,
 	DEATHMATCH,
@@ -30,14 +29,18 @@ enum GameTypes
 	NUM
 };
 
-class Entity
-{
+struct traceresult_s {
+	Vector3 end;
+	bool collided;
+};
+
+class Entity {
 public:
 	uint32_t VTable; //0x0000
 	Vector3 PositionHead; //0x0004
 	char pad_0010[24]; //0x0010
 	Vector3 Position; //0x0028
-	Vector2 Angle; //0x0034
+	Vector3 Angle; //0x0034
 	char pad_003C[40]; //0x003C
 	uint8_t N0000021C; //0x0064
 	uint8_t N0000021E; //0x0065
@@ -68,20 +71,17 @@ public:
 	char pad_0368[472]; //0x0368
 }; //Size: 0x0540
 
-class Base
-{
+class Base {
 public:
 	class EnitityList* EntityListPointer; //0x0000
 }; //Size: 0x0004
 
-class EnitityList
-{
+class EnitityList {
 public:
 	class Entity* Entities[32]; //0x0000
 }; //Size: 0x0080
 
-class Weapon
-{
+class Weapon {
 public:
 	char pad_0000[8]; //0x0000
 	class Entity* WeaponOwner; //0x0008
@@ -89,8 +89,7 @@ public:
 	char pad_0010[80]; //0x0010
 }; //Size: 0x0060
 
-class WeaponInitializer
-{
+class WeaponInitializer {
 public:
 	char pad_0000[64]; //0x0000
 	int16_t N00000E42; //0x0040

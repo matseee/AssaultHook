@@ -24,5 +24,7 @@ protected:
 
 	void AimToEntity(Entity* entity);
 	Vector3 CalcAngle(Entity* entity);
+	
+	bool IsVisible(Entity* entity);
 };
 

@@ -1,5 +1,8 @@
 #include "pch.h"
 #include "aimbot.h"
+#include "geomatry.h"
+
+#include "AssaultCubeAddresses.h"
 
 void Aimbot::Initialize(Entity* localPlayer, EnitityList* entityList, int* playerCount) {
 	this->localPlayer = localPlayer;
@@ -37,10 +40,6 @@ Entity* Aimbot::GetBestEntity() {
 
 	Entity* entity = nullptr;
 
-	Vector3 localAngles;
-	localAngles.x = this->localPlayer->Angle.x;
-	localAngles.y = this->localPlayer->Angle.y;
-
 	for (int i = 0; i < *this->playerCount; i++) {
 		if (this->entityList && this->entityList->Entities[i]) {
 			Entity* maybeEntity = this->entityList->Entities[i];
@@ -48,9 +47,12 @@ Entity* Aimbot::GetBestEntity() {
 			if (maybeEntity->Health <= 0) {
 				continue;
 			}
+			
+			if (!this->IsVisible(maybeEntity)) {
+				continue;
+			}
 
-			Vector3 angle = this->CalcAngle(maybeEntity);
-			newDistance = localAngles.Distance(angle);
+			newDistance = this->localPlayer->Position.Distance(maybeEntity->Position);
 
 			if (newDistance < distance || distance == 0) {
 				distance = newDistance;
@@ -62,18 +64,44 @@ Entity* Aimbot::GetBestEntity() {
 	return entity;
 }
 
+bool Aimbot::IsVisible(Entity* entity) {
+	DWORD intersectClosest = ADDR_INTERSECTCLOSEST_FUNCTION;
+
+	traceresult_s traceresult;
+	traceresult.collided = false;
+
+	Vector3 from = this->localPlayer->PositionHead;
+	Vector3 to = entity->PositionHead;
+
+	__asm
+	{
+		push 0; bSkipTags
+		push 0; bCheckPlayers
+		push localPlayer
+		push to.z
+		push to.y
+		push to.x
+		push from.z
+		push from.y
+		push from.x
+		lea eax, [traceresult]
+		call intersectClosest;
+		add esp, 36
+	}
+
+	return !traceresult.collided;
+}
+
 void Aimbot::AimToEntity(Entity* entity) {
 	Vector3 angle = this->CalcAngle(entity);
 
-	localPlayer->Angle.x = angle.x;
-	localPlayer->Angle.y = angle.y;
+	this->localPlayer->Angle.x = angle.x;
+	this->localPlayer->Angle.y = angle.y;
 }
 
 Vector3 Aimbot::CalcAngle(Entity* entity) {
 	Vector3 v = entity->PositionHead;
 	v.z -= .1f;
-
-	v = this->localPlayer->PositionHead - v;
 
 	Vector3 angles;
 	angles.x = ::atanf(v.x / v.y) * -57.2957795f;
