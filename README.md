@@ -1,7 +1,9 @@
 # AssaultHook
-internal cheat written in c++. After the DLL is injected into the game, a new thread is created. In this thread the needed hack instances are created and the opengl function [`wglSwapBuffers`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-wglswaplayerbuffers) is hooked using a [trampoline function](http://jbremer.org/x86-api-hooking-demystified/#ah-trampoline). The cheat logic is then executed in the hooked function. The advantage of the `wglSwapBuffers` function is that it is called at the end of each rendered frame.
+is an internal cheat for the game [AssaultCube](https://github.com/assaultcube/AC) written in c++. I wrote this cheat to refresh my introduction to programming. The game AssaultCube was chosen for this because it needs little resources, is open source and well documented for cheat development.
 
-The cheat has the following features:
+After the AssaultHook-DLL is injected into the game, a new thread is created. In this thread the needed hack instances are created and the opengl function [`wglSwapBuffers`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-wglswaplayerbuffers) is hooked using a [trampoline function](http://jbremer.org/x86-api-hooking-demystified/#ah-trampoline). The cheat logic is then executed in the hooked function. The advantage of the `wglSwapBuffers` function is that it is called at the end of each rendered frame.
+
+### The cheat has the following features:
 | feature | how its done |
 | --- | --- |
 | Unlimited health | set integer every tick |
