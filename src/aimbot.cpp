@@ -48,43 +48,16 @@ AcEntity* Aimbot::GetBestEntity() {
 }
 
 bool Aimbot::IsVisible(AcEntity* entity) {
+	AcEntity* localPlayer = this->acState->LocalPlayer;
 	int hitzone = -1;
 	float bestDistanceSquared = 0.f;
-	vec to;
-	if (entity->Head.x >= 0) {
-		to = vec(entity->Head.x, entity->Head.y, entity->Head.z - 0.1f);
-	}
-	else {
-		to = vec(entity->Origin.x, entity->Origin.y, entity->Origin.z - 0.1f);
-	}
-
-	float distance = this->acState->LocalPlayer->Origin.Distance(entity->Origin);
-	float scaleFactor = distance * 1.5f / distance;
-
-	Vector3 scaledTo = (entity->Origin - this->acState->LocalPlayer->Origin) * scaleFactor + this->acState->LocalPlayer->Origin;
-	to = vec(scaledTo.x, scaledTo.y, scaledTo.z);
-
-	AcEntity* localPlayer = this->acState->LocalPlayer;
 	
-	// int __usercall IntersectClosest@<eax>(int a1@<edx>, int aEntity, float* aBestDistSquared, _DWORD * aHitzone, char aAiming) <= IDA at 0x004CA250
-	DWORD IntersectClosest = ADDR_INTERSECTCLOSEST_FUNCTION;
-	AcEntity* foundPlayerEntity = nullptr;
-	
-	void* aHitzone = &hitzone;
-	void* aBestDist = &bestDistanceSquared;
-	void* aTo = &to;
+	Vector3 tmpTo = entity->Head.x >= 0 ? entity->Head : entity->Origin;
 
-	__asm
-	{
-		push 0
-		push aHitzone
-		push aBestDist
-		push localPlayer
-		mov edx, aTo
-		call IntersectClosest
-		mov foundPlayerEntity, eax
-		add esp, 10h
-	}
+	vec from = vec(localPlayer->Origin.x, localPlayer->Origin.y, localPlayer->Origin.z);
+	vec to = vec(tmpTo.x, tmpTo.y, tmpTo.z);
+
+	AcEntity* foundPlayerEntity = this->CallIntersectClosest(from, to, localPlayer, bestDistanceSquared, hitzone, true);
 
 	if (!hitzone || foundPlayerEntity != entity || foundPlayerEntity == this->acState->LocalPlayer) {
 		return false;
@@ -92,6 +65,33 @@ bool Aimbot::IsVisible(AcEntity* entity) {
 
 	Log::Debug() << "Aimbot::IsVisible: Found player entity => " << (void*)foundPlayerEntity << " / Hitzone => " << hitzone << std::endl;
 	return true;
+}
+// Wrapper for original AssaultCube "intersectclosest" function (at = LocalPlayer)
+// int __usercall IntersectClosest@<eax>(int to@<edx>, int at, float* bestdistsquared, _DWORD* hitzone, char aAiming) <= at 0x004CA250
+AcEntity* Aimbot::CallIntersectClosest(const vec& from, const vec& to, const AcEntity* at, float& bestdistsquared, int& hitzone, bool aiming) {
+	DWORD FuncIntersectClosest = ADDR_INTERSECTCLOSEST_FUNCTION;
+	AcEntity* resultEntity = nullptr;
+
+	void* aHitzone = &hitzone;
+	void* aBestDist = &bestdistsquared;
+	void* aTo = (void*)&to;
+
+	// Compiler magic happens here. This function gets called from four different places, but everytime the "at"-Entity is the LocalPlayer
+	// and also the "from"-argument is the position of the LocalPlayer - SO the compiler decided to throw away the from-argument and only use
+	// the "at" entity (which is the same address)...
+	__asm
+	{
+		push [aiming]
+		push aHitzone
+		push aBestDist
+		push at
+		mov edx, aTo
+		call FuncIntersectClosest
+		mov resultEntity, eax
+		add esp, 10h
+	}
+
+	return resultEntity;
 }
 
 void Aimbot::AimToEntity(AcEntity* entity) {

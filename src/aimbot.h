@@ -17,6 +17,6 @@ protected:
 	
 	bool IsVisible(AcEntity* entity);
 
-	//AcEntity* CallIntersectClosest(const vec& from, const vec& to, const AcEntity* at, float& bestdistsquared, int& hitzone, bool aiming = true);
+	AcEntity* CallIntersectClosest(const vec& from, const vec& to, const AcEntity* at, float& bestdistsquared, int& hitzone, bool aiming = true);
 };
 
