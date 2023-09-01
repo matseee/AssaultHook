@@ -140,6 +140,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="acFunctions.h" />
     <ClInclude Include="acState.h" />
     <ClInclude Include="aimbot.h" />
     <ClInclude Include="acAddresses.h" />
@@ -158,6 +159,7 @@
     <ClInclude Include="pch.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="acFunctions.cpp" />
     <ClCompile Include="acState.cpp" />
     <ClCompile Include="aimbot.cpp" />
     <ClCompile Include="log.cpp" />

@@ -1,7 +1,7 @@
 #pragma once
 #include "framework.h"
 #include "log.h"
-#include "acStructs.h"
+#include "acFunctions.h"
 #include "geomatry.h"
 #include "hack.h"
 
@@ -16,7 +16,5 @@ protected:
 	Vector3 CalcAngle(AcEntity* entity);
 	
 	bool IsVisible(AcEntity* entity);
-
-	AcEntity* CallIntersectClosest(const vec& from, const vec& to, const AcEntity* at, float& bestdistsquared, int& hitzone, bool aiming = true);
 };
 

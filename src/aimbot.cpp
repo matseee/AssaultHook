@@ -49,49 +49,12 @@ AcEntity* Aimbot::GetBestEntity() {
 
 bool Aimbot::IsVisible(AcEntity* entity) {
 	AcEntity* localPlayer = this->acState->LocalPlayer;
-	int hitzone = -1;
-	float bestDistanceSquared = 0.f;
-	
 	Vector3 tmpTo = entity->Head.x >= 0 ? entity->Head : entity->Origin;
-
 	vec from = vec(localPlayer->Origin.x, localPlayer->Origin.y, localPlayer->Origin.z);
 	vec to = vec(tmpTo.x, tmpTo.y, tmpTo.z);
 
-	AcEntity* foundPlayerEntity = this->CallIntersectClosest(from, to, localPlayer, bestDistanceSquared, hitzone, true);
-
-	if (!hitzone || foundPlayerEntity != entity || foundPlayerEntity == this->acState->LocalPlayer) {
-		return false;
-	}
-
-	Log::Debug() << "Aimbot::IsVisible: Found player entity => " << (void*)foundPlayerEntity << " / Hitzone => " << hitzone << std::endl;
-	return true;
-}
-// Wrapper for original AssaultCube "intersectclosest" function (at = LocalPlayer)
-// int __usercall IntersectClosest@<eax>(int to@<edx>, int at, float* bestdistsquared, _DWORD* hitzone, char aAiming) <= at 0x004CA250
-AcEntity* Aimbot::CallIntersectClosest(const vec& from, const vec& to, const AcEntity* at, float& bestdistsquared, int& hitzone, bool aiming) {
-	DWORD FuncIntersectClosest = ADDR_INTERSECTCLOSEST_FUNCTION;
-	AcEntity* resultEntity = nullptr;
-
-	void* aHitzone = &hitzone;
-	void* aBestDist = &bestdistsquared;
-	void* aTo = (void*)&to;
-
-	// Compiler magic happens here. This function gets called from four different places, but everytime the "at"-Entity is the LocalPlayer
-	// and also the "from"-argument is the position of the LocalPlayer - SO the compiler decided to throw away the from-argument and only use
-	// the "at" entity (which is the same address)...
-	__asm
-	{
-		push [aiming]
-		push aHitzone
-		push aBestDist
-		push at
-		mov edx, aTo
-		call FuncIntersectClosest
-		mov resultEntity, eax
-		add esp, 10h
-	}
-
-	return resultEntity;
+	AcIntersectGeometry(from, to);
+	return to.x == tmpTo.x && to.y == tmpTo.y && to.z == tmpTo.z;
 }
 
 void Aimbot::AimToEntity(AcEntity* entity) {

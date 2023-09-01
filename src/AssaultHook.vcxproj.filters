@@ -84,6 +84,9 @@
     <ClInclude Include="memhack.h">
       <Filter>hacks</Filter>
     </ClInclude>
+    <ClInclude Include="acFunctions.h">
+      <Filter>assaultcube</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -127,6 +130,9 @@
     </ClCompile>
     <ClCompile Include="memhack.cpp">
       <Filter>hacks</Filter>
+    </ClCompile>
+    <ClCompile Include="acFunctions.cpp">
+      <Filter>assaultcube</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
