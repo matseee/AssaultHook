@@ -1,107 +1,109 @@
 #include "pch.h"
 #include "aimbot.h"
-#include "geomatry.h"
-
-#include "AssaultCubeAddresses.h"
-
-void Aimbot::Initialize(Entity* localPlayer, EnitityList* entityList, int* playerCount) {
-	this->localPlayer = localPlayer;
-	this->entityList = entityList;
-	this->playerCount = playerCount;
-
-	this->isInitialized = true;
-}
-
-void Aimbot::SetEnabled(bool enabled) {
-	this->isEnabled = enabled;
-}
 
 void Aimbot::Tick() {
-	if (!this->isEnabled || !this->isInitialized) {
+	if (!this->IsActiveAndReady() || !(GetAsyncKeyState(VK_RBUTTON) & 0x8000)) {
 		return;
 	}
 
-	if (GetAsyncKeyState(VK_RBUTTON) & 0x8000) {
-		Entity* entity = this->GetBestEntity();
-
-		if (entity) {
-			this->AimToEntity(entity);
-		}
+	AcEntity* entity = this->GetBestEntity();
+	if (!entity) {
+		Log::Debug() << "Aimbot::GetBestEntity(): No entity found!" << std::endl;
+		return;
 	}
+
+	this->AimToEntity(entity);
 }
 
-bool Aimbot::IsInitialized() {
-	return this->isInitialized;
-}
+AcEntity* Aimbot::GetBestEntity() {
+	if (!this->acState->EntityList || !this->acState->EntityList->Entities) {
+		Log::Warning() << "Aimbot::GetBestEntity(): \"acState->EntityList\" not available ..." << std::endl;
+		this->acState->UpdateAttributes();
+		return nullptr;
+	}
 
-Entity* Aimbot::GetBestEntity() {
+	AcEntity* bestEntity = nullptr;
+	AcEntity* entity = nullptr;
+
+	float bestDistance = 0;
 	float distance = 0;
-	float newDistance = 0;
 
-	Entity* entity = nullptr;
+	for (int i = 0; i < *this->acState->PlayerCount; i++) {
+		if (!this->acState->IsValidEntity(this->acState->EntityList->Entities[i])) {
+			continue;
+		}
 
-	for (int i = 0; i < *this->playerCount; i++) {
-		if (this->entityList && this->entityList->Entities[i]) {
-			Entity* maybeEntity = this->entityList->Entities[i];
+		entity = this->acState->EntityList->Entities[i];
+		if (!this->acState->IsEnemy(entity) || !this->IsVisible(entity)) {
+			continue;
+		}
 
-			if (maybeEntity->Health <= 0) {
-				continue;
-			}
-			
-			if (!this->IsVisible(maybeEntity)) {
-				continue;
-			}
-
-			newDistance = this->localPlayer->Position.Distance(maybeEntity->Position);
-
-			if (newDistance < distance || distance == 0) {
-				distance = newDistance;
-				entity = maybeEntity;
-			}
+		distance = this->acState->LocalPlayer->Origin.Distance(entity->Origin);
+		if (distance < bestDistance || bestDistance == 0) {
+			bestDistance = distance;
+			bestEntity = entity;
 		}
 	}
-
-	return entity;
+	return bestEntity;
 }
 
-bool Aimbot::IsVisible(Entity* entity) {
-	DWORD intersectClosest = ADDR_INTERSECTCLOSEST_FUNCTION;
+bool Aimbot::IsVisible(AcEntity* entity) {
+	int hitzone = -1;
+	float bestDistanceSquared = 0.f;
+	vec to;
+	if (entity->Head.x >= 0) {
+		to = vec(entity->Head.x, entity->Head.y, entity->Head.z - 0.1f);
+	}
+	else {
+		to = vec(entity->Origin.x, entity->Origin.y, entity->Origin.z - 0.1f);
+	}
 
-	traceresult_s traceresult;
-	traceresult.collided = false;
+	float distance = this->acState->LocalPlayer->Origin.Distance(entity->Origin);
+	float scaleFactor = distance * 1.5f / distance;
 
-	Vector3 from = this->localPlayer->PositionHead;
-	Vector3 to = entity->PositionHead;
+	Vector3 scaledTo = (entity->Origin - this->acState->LocalPlayer->Origin) * scaleFactor + this->acState->LocalPlayer->Origin;
+	to = vec(scaledTo.x, scaledTo.y, scaledTo.z);
+
+	AcEntity* localPlayer = this->acState->LocalPlayer;
+	
+	// int __usercall IntersectClosest@<eax>(int a1@<edx>, int aEntity, float* aBestDistSquared, _DWORD * aHitzone, char aAiming) <= IDA at 0x004CA250
+	DWORD IntersectClosest = ADDR_INTERSECTCLOSEST_FUNCTION;
+	AcEntity* foundPlayerEntity = nullptr;
+	
+	void* aHitzone = &hitzone;
+	void* aBestDist = &bestDistanceSquared;
+	void* aTo = &to;
 
 	__asm
 	{
-		push 0; bSkipTags
-		push 0; bCheckPlayers
+		push 0
+		push aHitzone
+		push aBestDist
 		push localPlayer
-		push to.z
-		push to.y
-		push to.x
-		push from.z
-		push from.y
-		push from.x
-		lea eax, [traceresult]
-		call intersectClosest;
-		add esp, 36
+		mov edx, aTo
+		call IntersectClosest
+		mov foundPlayerEntity, eax
+		add esp, 10h
 	}
 
-	return !traceresult.collided;
+	if (!hitzone || foundPlayerEntity != entity || foundPlayerEntity == this->acState->LocalPlayer) {
+		return false;
+	}
+
+	Log::Debug() << "Aimbot::IsVisible: Found player entity => " << (void*)foundPlayerEntity << " / Hitzone => " << hitzone << std::endl;
+	return true;
 }
 
-void Aimbot::AimToEntity(Entity* entity) {
+void Aimbot::AimToEntity(AcEntity* entity) {
 	Vector3 angle = this->CalcAngle(entity);
-
-	this->localPlayer->Angle.x = angle.x;
-	this->localPlayer->Angle.y = angle.y;
+	this->acState->LocalPlayer->Angle.x = angle.x;
+	this->acState->LocalPlayer->Angle.y = angle.y;
 }
 
-Vector3 Aimbot::CalcAngle(Entity* entity) {
-	Vector3 v = entity->PositionHead;
-	v.z -= .1f;
+Vector3 Aimbot::CalcAngle(AcEntity* entity) {
+	Vector3 v = entity->Head.x >= 0 ? entity->Head : entity->Origin;
+
+	v = this->acState->LocalPlayer->Origin - v;
 
 	Vector3 angles;
 	angles.x = ::atanf(v.x / v.y) * -57.2957795f;

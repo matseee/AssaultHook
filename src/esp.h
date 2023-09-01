@@ -1,6 +1,6 @@
 #pragma once
-#include "AssaultCubeStructs.h"
-#include "AssaultCubeAddresses.h"
+#include "hack.h"
+#include "acState.h"
 #include "openGLDraw.h"
 #include "openGLText.h"
 
@@ -15,38 +15,38 @@ const float PLAYER_ASPECT_RATIO = PLAYER_HEIGHT / PLAYER_WIDTH;
 const int ESP_FONT_HEIGHT = 15;
 const int ESP_FONT_WIDTH = 9;
 
-class ESP {
+class ESPBase : public Hack {
 public:
-	void Initialize(Entity* localPlayer, EnitityList* entityList, float* matrix, int* gameMode, int* playerCount);
-
-	void SetBoxActive(bool active);
-	void SetSnaplineActive(bool active);
-
-	bool IsInitialized();
-
 	void Tick();
 protected:
-	bool isInitialized = false;
-
-	bool isBoxActive = false;
-	bool isSnaplineActive = false;
-
 	int viewport[4];
 	
-	int* gameMode = nullptr;
-	int* playerCount = nullptr;
-	float* matrix = nullptr;
+	void LoopOverEntities();
+	virtual void Render(AcEntity* entity, Vector3 screenCoordinates) {};
 
-	Entity* localPlayer = nullptr;
-	EnitityList* entityList = nullptr;
+	const GLubyte* GetEntityColor(AcEntity* entity);
+	float GetDistanceTo(AcEntity* entity);
+};
 
+class ESPBox : public ESPBase {
+protected:
+	void Render(AcEntity* entity, Vector3 screenCoordinates);
+	void GetScaledEntityBox(AcEntity* entity, Vector3 screenCoordinates, float* x, float* y, float* height, float* width);
+};
+
+class ESPHealth : public ESPBox {
+protected:
+	void Render(AcEntity* entity, Vector3 screenCoordinates);
+};
+
+class ESPName : public ESPBox {
+protected:
 	openGLText::Font openGLFont;
+	void Render(AcEntity* entity, Vector3 screenCoordinates);
+};
 
-	bool IsTeamGame();
-	bool IsEnemy(Entity* entity);
-	bool IsValidEntity(Entity* entity);
-
-	void DrawEntityBox(Entity* entity, Vector3 screen);
-	void DrawEntitySnapline(Entity* entity, Vector3 screenCordinates);
+class ESPLine : public ESPBase {
+protected:
+	void Render(AcEntity* entity, Vector3 screenCoordinates);
 };
 

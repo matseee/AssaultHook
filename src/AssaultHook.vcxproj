@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -78,6 +78,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -139,11 +140,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="acState.h" />
     <ClInclude Include="aimbot.h" />
-    <ClInclude Include="AssaultCubeAddresses.h" />
-    <ClInclude Include="AssaultCubeStructs.h" />
+    <ClInclude Include="acAddresses.h" />
+    <ClInclude Include="acStructs.h" />
+    <ClInclude Include="log.h" />
     <ClInclude Include="esp.h" />
+    <ClInclude Include="memhack.h" />
     <ClInclude Include="geomatry.h" />
+    <ClInclude Include="hack.h" />
     <ClInclude Include="menu.h" />
     <ClInclude Include="openGLDraw.h" />
     <ClInclude Include="openGLText.h" />
@@ -153,9 +158,13 @@
     <ClInclude Include="pch.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="acState.cpp" />
     <ClCompile Include="aimbot.cpp" />
+    <ClCompile Include="log.cpp" />
     <ClCompile Include="esp.cpp" />
+    <ClCompile Include="memhack.cpp" />
     <ClCompile Include="geomatry.cpp" />
+    <ClCompile Include="hack.cpp" />
     <ClCompile Include="menu.cpp" />
     <ClCompile Include="openGLDraw.cpp" />
     <ClCompile Include="openGLText.cpp" />

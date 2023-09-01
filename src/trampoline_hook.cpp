@@ -1,34 +1,37 @@
 #include "pch.h"
 #include "trampoline_hook.h"
 
-using namespace Hook;
-
-TrampolineHook::TrampolineHook() {
-	this->pSource = nullptr;
-	this->pDestination = nullptr;
-	this->dwLen = NULL;
-
-	this->pGateway = nullptr;
-}
-
-bool TrampolineHook::initialize(BYTE* pSource, BYTE* pDestination, uintptr_t dwLen) {
+TrampolineHook::TrampolineHook(BYTE* pSource, BYTE* pDestination, uintptr_t dwLen) {
 	this->pSource = pSource;
 	this->pDestination = pDestination;
 	this->dwLen = dwLen;
-
 	this->pGateway = nullptr;
-
-	// parameter valid?
-	return TrampolineHook::CheckAllowed(this->pSource, this->pDestination, this->dwLen);
 }
 
-BYTE* TrampolineHook::Enable() {
+BYTE* TrampolineHook::Create() {
+	if (!this->CreateGateway()) {
+		return nullptr;
+	}
 
-	// create gateway
+	if (!this->Detour()) {
+		return nullptr;
+	}
+
+	Log::Debug() << "TrampolineHook::Create(): Trampoline created successfully ..." << std::endl;
+	return this->pGateway;
+}
+
+bool TrampolineHook::Destroy() {
+	// TODO: rewrite stolen bytes
+	return true;
+}
+
+bool TrampolineHook::CreateGateway() {
 	this->pGateway = (BYTE*)VirtualAlloc(0, this->dwLen, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
 
 	if (!this->pGateway) {
-		return nullptr;
+		Log::Error() << "TrampolineHook::CreateGateway(): VirtualAlloc() failed ..." << std::endl;
+		return false;
 	}
 
 	// write stolen bytes to gateway
@@ -50,63 +53,55 @@ BYTE* TrampolineHook::Enable() {
 	// ... + relativeAddress
 	*(uintptr_t*)((uintptr_t)this->pGateway + this->dwLen + 1) = gatewayRelativeAddress;
 #endif
-	
-	if (this->Detour(this->pSource, this->pDestination, this->dwLen)) {
-		return this->pGateway;
-	}
 
-	return nullptr;
-}
-
-bool TrampolineHook::Disable() {
-	// TODO: rewrite stolen bytes
 	return true;
 }
 
-bool TrampolineHook::Detour(BYTE* pSource, BYTE* pDestination, uintptr_t dwLen) {
-
+bool TrampolineHook::Detour() {
 	// parameter valid?
-	if (!TrampolineHook::CheckAllowed(pSource, pDestination, dwLen)) {
+	if (!this->CheckAllowed()) {
 		return false;
 	}
 
 	// save current protection, to restore it after hooking
 	DWORD currentProtection;
-	VirtualProtect(pSource, dwLen, PAGE_EXECUTE_READWRITE, &currentProtection);
+	VirtualProtect(this->pSource, this->dwLen, PAGE_EXECUTE_READWRITE, &currentProtection);
 
 	// clear bytes that should be used for the jmp instruction
-	memset(pSource, 0x90, dwLen);
+	memset(this->pSource, 0x90, this->dwLen);
 
 #ifdef _WIN64
 	// absolute jmp + ...
-	*(uintptr_t*)pSource = DETOUR_JMP_INSTRUCTION;
+	*(uintptr_t*)this->pSource = DETOUR_JMP_INSTRUCTION;
 
 	// ... + absolute address
-	*(uintptr_t*)((uintptr_t)pSource + 8) = (uintptr_t)pDestination;
+	*(uintptr_t*)((uintptr_t)this->pSource + 8) = (uintptr_t)pDestination;
 #else
 	// calculate relative address for the jmp instruction
-	uintptr_t relativeAddress = pDestination - pSource - 5;
+	uintptr_t relativeAddress = this->pDestination - this->pSource - 5;
 
 	// jmp + ...
-	*(uintptr_t*)pSource = DETOUR_JMP_INSTRUCTION;
+	*(uintptr_t*)this->pSource = DETOUR_JMP_INSTRUCTION;
 
 	// ... + relativeAddress
-	*(uintptr_t*)(pSource + 1) = relativeAddress;
+	*(uintptr_t*)(this->pSource + 1) = relativeAddress;
 #endif
 
 	// restore protection
-	VirtualProtect(pSource, dwLen, currentProtection, &currentProtection);
+	VirtualProtect(this->pSource, this->dwLen, currentProtection, &currentProtection);
 
 	return true;
 }
 
-bool TrampolineHook::CheckAllowed(BYTE* pSource, BYTE* pDestination, uintptr_t dwLen) {
-	if (!pSource || !pDestination) {
+bool TrampolineHook::CheckAllowed() {
+	if (!this->pSource || !this->pDestination) {
+		Log::Error() << "TrampolineHook::CheckAllowed(): \"pSource\" or \"pDestination\" not set ..." << std::endl;
 		return false;
 	}
 
 	// check length for relative jmp instruction
-	if (dwLen < DETOUR_MIN_LENGTH) {
+	if (this->dwLen < DETOUR_MIN_LENGTH) {
+		Log::Error() << "TrampolineHook::CheckAllowed(): \"dwLen\" is smaller than " << DETOUR_MIN_LENGTH << " ..." << std::endl;
 		return false;
 	}
 

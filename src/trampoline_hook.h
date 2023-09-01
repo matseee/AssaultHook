@@ -1,8 +1,7 @@
 #pragma once
 #include "pch.h"
 #include "memory.h"
-
-namespace Hook {
+#include "log.h"
 
 #ifdef _WIN64
 #define DETOUR_MIN_LENGTH		16
@@ -12,25 +11,22 @@ namespace Hook {
 #define DETOUR_JMP_INSTRUCTION	0xE9
 #endif
 
-	class TrampolineHook
-	{
-	protected:
-		BYTE* pSource;
-		BYTE* pDestination;
-		
-		uintptr_t dwLen;
-		BYTE* pGateway;
+class TrampolineHook
+{
+public:
+	TrampolineHook(BYTE* pSource, BYTE* pDestination, uintptr_t dwLen);
 
-	public:
-		TrampolineHook();
+	BYTE* Create();
+	bool Destroy();
 
-		bool initialize(BYTE* pSource, BYTE* pDestination, uintptr_t dwLen);
+	bool CheckAllowed();
+protected:
+	BYTE* pSource;
+	BYTE* pDestination;
+	
+	uintptr_t dwLen;
+	BYTE* pGateway;
 
-		BYTE* Enable();
-		bool Disable();
-
-		static bool Detour(BYTE* pSource, BYTE* pDestination, uintptr_t dwLen);
-		static bool CheckAllowed(BYTE* pSource, BYTE* pDestination, uintptr_t dwLen);
-	};
-
-}
+	bool CreateGateway();
+	bool Detour();
+};

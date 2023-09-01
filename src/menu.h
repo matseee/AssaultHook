@@ -1,13 +1,12 @@
 #pragma once
+#include "hack.h"
+#include "log.h"
 #include "openGLDraw.h"
 #include "openGLText.h"
 
 struct MenuEntry {
 	const char* name;
-	bool active;
-	void (*toggleCallback)(bool);
-	void (*activeCallback)(void);
-	void (*tickCallback)(void);
+	Hack* hack;
 };
 
 class Menu
@@ -26,6 +25,9 @@ protected:
 	MenuEntry selectedEntry;
 	int selectedIndex;
 
-	void Draw();
+	void Input();
+	void Render();
+	void RenderMenu();
+	void ForwardTick();
 };
 

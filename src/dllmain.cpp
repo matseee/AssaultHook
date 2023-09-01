@@ -2,169 +2,115 @@
 #include "framework.h"
 #include "menu.h"
 
+#include "log.h"
 #include "trampoline_hook.h"
 #include "memory.h"
 #include "aimbot.h"
+#include "memhack.h"
 #include "esp.h"
 
-#include "AssaultCubeAddresses.h"
-#include "AssaultCubeStructs.h"
+#include "acAddresses.h"
+#include "acStructs.h"
+#include "acState.h"
 
-// hmodule for the created thread
-HMODULE hThread = nullptr;                                              
+HMODULE hThread = nullptr;
 
-// typedef for wglSwapBuffers function
+TrampolineHook* trampolineHook = nullptr;
 typedef BOOL(__stdcall* twglSwapBuffers) (HDC hDc);
-// original wglSwapBuffers function
-twglSwapBuffers originalWglSwapBuffers;
+twglSwapBuffers wglSwapBuffers;
 
-// main loop hook (OpenGL.wglSwapBuffers)
-Hook::TrampolineHook mainLoopHook = Hook::TrampolineHook();
-
-// opengl ingame menu
+AcState* acState = nullptr;
 Menu* menu = nullptr;
 
-// ac_client.exe base address
-uintptr_t moduleBaseAddress = (uintptr_t)GetModuleHandle(L"ac_client.exe");
-
-// ac_client.exe pointers
-int* gameMode = nullptr;
-int* playerCount = nullptr;
-float* matrix = nullptr;
-
-Entity* localPlayer = nullptr;
-EnitityList* entityList = nullptr;
-
-// game hacking objetcs
-Aimbot* aimbot = nullptr;
-ESP* esp = nullptr;
-
-// hacking menu callbacks
-void UnlHealthHackCallback() {
-    if (localPlayer) {
-        localPlayer->Health = 999;
-    } else {
-        localPlayer = *((Entity**)(moduleBaseAddress + ADDR_LOCAL_PLAYER_ENTITY));
-    }
-}
-
-void UnlAmmoHackCallback() {
-    int* pFirstWeaponAmmo = (int*)memory::FindDMAAddress(moduleBaseAddress + ADDR_FIRST_WEAPON_AMMO, OFF_FIRST_WEAPON_AMMO);
-    if (pFirstWeaponAmmo) {
-        *pFirstWeaponAmmo = 999;
-    }
-}
-
-void NoRecoilCallback(bool active) {
-    if (active) {
-        // instead of running the original calculateRecoil (?) function return directly
-        // ac_client.exe+C8BA0 - C2 0800               - ret 0008 { 8 }
-        memory::Patch((BYTE*)(moduleBaseAddress + ADDR_NORECOIL_FUNCTION), (BYTE*)"\xC2\x08\x00", 3);
-    } else {
-        // ac_client.exe+C8BA0 - 83 EC 28              - sub esp,28
-        memory::Patch((BYTE*)(moduleBaseAddress + ADDR_NORECOIL_FUNCTION), (BYTE*)"\x83\xEC\x28", 3);
-    }
-}
-
-void ESPChangeCallback(bool active) {
-    if (active && !esp->IsInitialized()) {
-        esp->Initialize(localPlayer, entityList, matrix, gameMode, playerCount);
-    }
-
-    esp->SetBoxActive(active);
-}
-
-void SnaplinesChangeCallback(bool active) {
-    if (active && !esp->IsInitialized()) {
-        esp->Initialize(localPlayer, entityList, matrix, gameMode, playerCount);
-    }
-
-    esp->SetSnaplineActive(active);
-}
-
-void AimbotChangeCallback(bool active) {
-    if (active && !aimbot->IsInitialized()) {
-        aimbot->Initialize(localPlayer, entityList, playerCount);
-    }
-
-    aimbot->SetEnabled(active);
-}
-
-// hacking tick callbacks (every rendering tick of opengl)
-void ESPTick() {
-    esp->Tick();
-}
-
-void AimbotTick() {
-    aimbot->Tick();
-}
-
-// menu entries
-std::vector<MenuEntry> menuEntries = {
-    MenuEntry{ "Unl. Health",   false, nullptr,                 UnlHealthHackCallback,  nullptr },
-    MenuEntry{ "Unl. Ammo",     false, nullptr,                 UnlAmmoHackCallback,    nullptr },
-    MenuEntry{ "No Recoil",     false, NoRecoilCallback,        nullptr,                nullptr },
-    MenuEntry{ "ESP",           false, ESPChangeCallback,       nullptr,                ESPTick },
-    MenuEntry{ "Snapline",      false, SnaplinesChangeCallback, nullptr,                nullptr },
-    MenuEntry{ "Aimbot",        false, AimbotChangeCallback,    nullptr,                AimbotTick },
-};
-
 // hacking loop that is hooked into the opengl wglSwapBuffers function
-BOOL __stdcall MainLoop(HDC hDc) {
-    if (!gameMode) { gameMode = (int*)(moduleBaseAddress + ADDR_GAME_MODE); }
-    if (!playerCount) { playerCount = (int*)(moduleBaseAddress + ADDR_NUM_PLAYERS); }
-    if (!matrix) { matrix = (float*)(ADDR_MATRIX); }
-    if (!localPlayer) { localPlayer = *((Entity**)(moduleBaseAddress + ADDR_LOCAL_PLAYER_ENTITY)); }
-    if (!entityList) { entityList = *(EnitityList**)(moduleBaseAddress + ADDR_ENTITY_LIST); }
+BOOL __stdcall HookedWglSwapBuffers(HDC hDc) {
+	// create menu tick
+	menu->Tick();
 
-    // create menu tick
-    menu->Tick();
+	if (GetAsyncKeyState(VK_DELETE) & 1) {
+		Log::Get()->SetActive(false);
+		trampolineHook->Destroy();
+		FreeLibraryAndExitThread((HINSTANCE)hThread, 1);
+	}
 
-    if (GetAsyncKeyState(VK_DELETE) & 1) {
-        mainLoopHook.Disable();
-        FreeLibraryAndExitThread((HINSTANCE)hThread, 1);
-    }
-
-    return originalWglSwapBuffers(hDc);
+	return wglSwapBuffers(hDc);
 }
 
 // thread that creates the game hacking instances and hooks the opengl wglSawpBuffers function
 DWORD __stdcall Thread(HMODULE hModule) {
-    hThread = hModule;
+	hThread = hModule;
 
-    menu = new Menu("AssaultHook v1.0", menuEntries);
-    esp = new ESP();
-    aimbot = new Aimbot();
+	Log::Get()->SetActive(true);
+	Log::Info() << "DllMain::Thread(): Started ..." << std::endl;
 
-    // get handle to opengl module
-    HMODULE hModuleOpenGL = GetModuleHandle(L"opengl32.dll");
+	AcState* acState = AcState::Get();
+	while (!acState->IsReady()) {
+		Log::Warning() << "DllMain::Thread(): AcState not ready ... trying again ..." << std::endl;
+	}
 
-    if (hModuleOpenGL) {
-        // get address for wglSwapBuffers function
-        originalWglSwapBuffers = (twglSwapBuffers)GetProcAddress(hModuleOpenGL, "wglSwapBuffers");
+	std::vector<MenuEntry> menuEntries = {
+		MenuEntry{ "Aimbot", new Aimbot() },
+		MenuEntry{ "ESP Box", new ESPBox() },
+		MenuEntry{ "ESP Health", new ESPHealth() },
+		MenuEntry{ "ESP Line", new ESPLine() },
+		MenuEntry{
+			"Unl. Health",
+			new Freeze<int>(
+				(uintptr_t)&acState->LocalPlayer->Health,
+				69420
+			)
+		},
+		MenuEntry{
+			"Unl. Ammo",
+			new Freeze<int>(
+				(uintptr_t)memory::FindDMAAddress(
+					acState->ModuleBase + ADDR_FIRST_WEAPON_AMMO, OFF_FIRST_WEAPON_AMMO),
+				69420
+			),
+		},
+		MenuEntry{
+			"No Recoil",
+			// instead of running the original calculateRecoil function, return directly
+			new Patch(
+				(uintptr_t)ADDR_NORECOIL_FUNCTION,
+				// ac_client.exe+C8BA0 - C2 08 00              - ret 0008 { 8 }
+				(uintptr_t)"\xC2\x08\x00",
+				// ac_client.exe+C8BA0 - 83 EC 28              - sub esp,28
+				(uintptr_t)"\x83\xEC\x28",
+				3
+			)
+		},
+		MenuEntry{
+			"Debug Log",
+			new Hack(true, [](bool active) { Log::Get()->SetActive(active); })
+		}
+	};
 
-        if (originalWglSwapBuffers) {
-            // create trampoline hook for the function wglSwapBuffers
-            mainLoopHook.initialize((BYTE*)originalWglSwapBuffers, (BYTE*)MainLoop, 5);
+	menu = new Menu("AssaultHook v1.0", menuEntries);
 
-            // enable the hook -> start MainLoop
-            originalWglSwapBuffers = (twglSwapBuffers)mainLoopHook.Enable();
-        }
-    }
+	wglSwapBuffers = (twglSwapBuffers)GetProcAddress((HMODULE)acState->ModuleOpenGl, "wglSwapBuffers");
+	if (!wglSwapBuffers) {
+		Log::Error() << "DllMain::Thread(): Could not get \"wglSwapBuffers\" address ..." << std::endl;
+	}
+	Log::Debug() << "DllMain::Thread(): GetProcAddress(\"wglSwapBuffers\") => " << (void*)wglSwapBuffers << std::endl;
 
-    return 0;
+	trampolineHook = new TrampolineHook((BYTE*)wglSwapBuffers, (BYTE*)HookedWglSwapBuffers, 5);
+	wglSwapBuffers = (twglSwapBuffers)trampolineHook->Create();
+
+	Log::Info() << "DllMain::Thread(): Finished ..." << std::endl;
+	return 0;
 }
 
 // entry point of the dll that creates a new thread
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD  dwReasonForCall, LPVOID lpReserved) {
-    if (dwReasonForCall == DLL_PROCESS_ATTACH) {
-        HANDLE hTread = CreateThread(nullptr, 0, (LPTHREAD_START_ROUTINE)Thread, hModule, 0, nullptr);
-        
-        if (hTread) {
-            CloseHandle(hTread);
-        }
-    }
+	if (dwReasonForCall == DLL_PROCESS_ATTACH) {
+		HANDLE hTread = CreateThread(nullptr, 0, (LPTHREAD_START_ROUTINE)Thread, hModule, 0, nullptr);
 
-    return TRUE;
+		if (hTread) {
+			CloseHandle(hTread);
+		}
+	}
+
+	return TRUE;
 }
 

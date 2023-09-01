@@ -28,6 +28,12 @@
     <Filter Include="hacks">
       <UniqueIdentifier>{095122c7-4132-4b03-98c3-fb57aae4eca6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="assaultcube">
+      <UniqueIdentifier>{bae88aab-402b-410d-a33c-b0a4a06b0472}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="utils">
+      <UniqueIdentifier>{bba7a437-36d9-42a7-bb16-d201e5e75c24}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -41,9 +47,6 @@
     </ClInclude>
     <ClInclude Include="trampoline_hook.h">
       <Filter>memory</Filter>
-    </ClInclude>
-    <ClInclude Include="AssaultCubeStructs.h">
-      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="menu.h">
       <Filter>menu</Filter>
@@ -60,10 +63,25 @@
     <ClInclude Include="esp.h">
       <Filter>hacks</Filter>
     </ClInclude>
-    <ClInclude Include="AssaultCubeAddresses.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="aimbot.h">
+      <Filter>hacks</Filter>
+    </ClInclude>
+    <ClInclude Include="acAddresses.h">
+      <Filter>assaultcube</Filter>
+    </ClInclude>
+    <ClInclude Include="acStructs.h">
+      <Filter>assaultcube</Filter>
+    </ClInclude>
+    <ClInclude Include="log.h">
+      <Filter>utils</Filter>
+    </ClInclude>
+    <ClInclude Include="hack.h">
+      <Filter>hacks</Filter>
+    </ClInclude>
+    <ClInclude Include="acState.h">
+      <Filter>assaultcube</Filter>
+    </ClInclude>
+    <ClInclude Include="memhack.h">
       <Filter>hacks</Filter>
     </ClInclude>
   </ItemGroup>
@@ -96,6 +114,18 @@
       <Filter>hacks</Filter>
     </ClCompile>
     <ClCompile Include="aimbot.cpp">
+      <Filter>hacks</Filter>
+    </ClCompile>
+    <ClCompile Include="log.cpp">
+      <Filter>utils</Filter>
+    </ClCompile>
+    <ClCompile Include="hack.cpp">
+      <Filter>hacks</Filter>
+    </ClCompile>
+    <ClCompile Include="acState.cpp">
+      <Filter>assaultcube</Filter>
+    </ClCompile>
+    <ClCompile Include="memhack.cpp">
       <Filter>hacks</Filter>
     </ClCompile>
   </ItemGroup>

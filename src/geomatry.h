@@ -7,7 +7,7 @@ class Vector3
 public:
     float x, y, z;
 
-    Vector3() {};
+    Vector3(): x(0.0f), y(0.0f), z(0.0f) {};
     Vector3(const float x, const float y, const float z) : x(x), y(y), z(z) {}
     Vector3 operator + (const Vector3& rhs) const { return Vector3(x + rhs.x, y + rhs.y, z + rhs.z); }
     Vector3 operator - (const Vector3& rhs) const { return Vector3(x - rhs.x, y - rhs.y, z - rhs.z); }

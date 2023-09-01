@@ -1,30 +1,22 @@
 #pragma once
 #include "framework.h"
-#include "AssaultCubeStructs.h"
+#include "log.h"
+#include "acStructs.h"
+#include "geomatry.h"
+#include "hack.h"
 
-class Aimbot {
+class Aimbot : public Hack {
 public:
-	void Initialize(Entity* localPlayer, EnitityList* entityList, int* playerCount);
-	void SetEnabled(bool enabled);
-
 	void Tick();
 
-	bool IsInitialized();
-
 protected:
-	int* playerCount;
+	AcEntity* GetBestEntity();
 
-	Entity* localPlayer;
-	EnitityList* entityList;
-
-	bool isInitialized = false;
-	bool isEnabled = false;
-
-	Entity* GetBestEntity();
-
-	void AimToEntity(Entity* entity);
-	Vector3 CalcAngle(Entity* entity);
+	void AimToEntity(AcEntity* entity);
+	Vector3 CalcAngle(AcEntity* entity);
 	
-	bool IsVisible(Entity* entity);
+	bool IsVisible(AcEntity* entity);
+
+	//AcEntity* CallIntersectClosest(const vec& from, const vec& to, const AcEntity* at, float& bestdistsquared, int& hitzone, bool aiming = true);
 };
 
