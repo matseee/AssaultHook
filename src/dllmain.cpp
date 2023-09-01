@@ -1,17 +1,16 @@
-#include "pch.h"
-#include "framework.h"
-#include "menu.h"
+#include "utils/log.h"
+#include "menu/menu.h"
 
-#include "log.h"
-#include "trampoline_hook.h"
-#include "memory.h"
-#include "aimbot.h"
-#include "memhack.h"
-#include "esp.h"
+#include "memory/trampoline_hook.h"
+#include "memory/memory.h"
 
-#include "acAddresses.h"
-#include "acStructs.h"
-#include "acState.h"
+#include "hacks/aimbot.h"
+#include "hacks/memhack.h"
+#include "hacks/esp.h"
+
+#include "ac/acAddresses.h"
+#include "ac/acStructs.h"
+#include "ac/acState.h"
 
 HMODULE hThread = nullptr;
 
@@ -51,6 +50,7 @@ DWORD __stdcall Thread(HMODULE hModule) {
 	std::vector<MenuEntry> menuEntries = {
 		MenuEntry{ "Aimbot", new Aimbot() },
 		MenuEntry{ "ESP Box", new ESPBox() },
+		MenuEntry{ "ESP Name", new ESPName() },
 		MenuEntry{ "ESP Health", new ESPHealth() },
 		MenuEntry{ "ESP Line", new ESPLine() },
 		MenuEntry{
@@ -113,4 +113,3 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD  dwReasonForCall, LPVOID lpReserved
 
 	return TRUE;
 }
-

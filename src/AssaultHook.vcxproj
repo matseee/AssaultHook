@@ -76,9 +76,10 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;ASSAULTHOOK_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <PrecompiledHeader>Use</PrecompiledHeader>
-      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>$(ProjectDir)pch\pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
+      <ForcedIncludeFiles>%(ForcedIncludeFiles)</ForcedIncludeFiles>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -140,45 +141,39 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="acFunctions.h" />
-    <ClInclude Include="acState.h" />
-    <ClInclude Include="aimbot.h" />
-    <ClInclude Include="acAddresses.h" />
-    <ClInclude Include="acStructs.h" />
-    <ClInclude Include="log.h" />
-    <ClInclude Include="esp.h" />
-    <ClInclude Include="memhack.h" />
-    <ClInclude Include="geomatry.h" />
-    <ClInclude Include="hack.h" />
-    <ClInclude Include="menu.h" />
-    <ClInclude Include="openGLDraw.h" />
-    <ClInclude Include="openGLText.h" />
-    <ClInclude Include="trampoline_hook.h" />
-    <ClInclude Include="framework.h" />
-    <ClInclude Include="memory.h" />
-    <ClInclude Include="pch.h" />
+    <ClInclude Include="ac\acAddresses.h" />
+    <ClInclude Include="ac\acFunctions.h" />
+    <ClInclude Include="ac\acState.h" />
+    <ClInclude Include="ac\acStructs.h" />
+    <ClInclude Include="opengl\opengl.h" />
+    <ClInclude Include="geometry\geometry.h" />
+    <ClInclude Include="hacks\aimbot.h" />
+    <ClInclude Include="hacks\esp.h" />
+    <ClInclude Include="hacks\hack.h" />
+    <ClInclude Include="hacks\memhack.h" />
+    <ClInclude Include="memory\memory.h" />
+    <ClInclude Include="memory\trampoline_hook.h" />
+    <ClInclude Include="menu\menu.h" />
+    <ClInclude Include="opengl\draw.h" />
+    <ClInclude Include="opengl\text.h" />
+    <ClInclude Include="utils\log.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="acFunctions.cpp" />
-    <ClCompile Include="acState.cpp" />
-    <ClCompile Include="aimbot.cpp" />
-    <ClCompile Include="log.cpp" />
-    <ClCompile Include="esp.cpp" />
-    <ClCompile Include="memhack.cpp" />
-    <ClCompile Include="geomatry.cpp" />
-    <ClCompile Include="hack.cpp" />
-    <ClCompile Include="menu.cpp" />
-    <ClCompile Include="openGLDraw.cpp" />
-    <ClCompile Include="openGLText.cpp" />
-    <ClCompile Include="trampoline_hook.cpp" />
+    <ClCompile Include="ac\acFunctions.cpp" />
+    <ClCompile Include="ac\acState.cpp" />
     <ClCompile Include="dllmain.cpp" />
-    <ClCompile Include="memory.cpp" />
-    <ClCompile Include="pch.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
-    </ClCompile>
+    <ClCompile Include="geometry\geometry.cpp" />
+    <ClCompile Include="hacks\aimbot.cpp" />
+    <ClCompile Include="hacks\esp.cpp" />
+    <ClCompile Include="hacks\hack.cpp" />
+    <ClCompile Include="hacks\memhack.cpp" />
+    <ClCompile Include="memory\memory.cpp" />
+    <ClCompile Include="memory\trampoline_hook.cpp" />
+    <ClCompile Include="menu\menu.cpp" />
+    <ClCompile Include="opengl\draw.cpp" />
+    <ClCompile Include="opengl\opengl.cpp" />
+    <ClCompile Include="opengl\text.cpp" />
+    <ClCompile Include="utils\log.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
