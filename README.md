@@ -8,13 +8,14 @@ After the AssaultHook-DLL is injected into the game, a new thread is created. In
 ### The cheat has the following features:
 | feature | how its done |
 | --- | --- |
+| Aimbot | loop over the entitiy list; check if the entity is alive; check if the entity is visible, by calling the `intersectgeometry` function from assault cube; calculate the needed viewing angles; set the viewing angles |
+| ESP Box | loop over the entitiy list; calculate the screen position using the [`WorldToScreen`](https://guidedhacking.com/threads/world2screen-direct3d-and-opengl-worldtoscreen-functions.8044/) function; render a rectangle|
+| ESP Name | same as esp; but render the name over the entity |
+| ESP Health | same as esp; but render a filled rect that changes color and decreases in size when the health drops |
+| ESP Line | same as esp; but render a line to the entity |
 | Unlimited health | set integer every tick |
 | Unlimted ammo | set integer every tick |
 | No recoil | overwrite instructions: instead of calculate the recoil just return directly |
-| ESP | loop over the entitiy list; calculate the screen position using the [`WorldToScreen`](https://guidedhacking.com/threads/world2screen-direct3d-and-opengl-worldtoscreen-functions.8044/) function; render a rectangle|
-| Snapline | same as esp; but render a line to the entity |
-| Aimbot | loop over the entitiy list; check if the entity is alive; check if the entity is visible, by calling the trace line function from assault cube; calculate the needed viewing angles; set the viewing angles |
-
 
 ![Screenshot](./img/screen.gif "screenshot")
 
