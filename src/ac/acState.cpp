@@ -11,8 +11,23 @@ AcState* AcState::Get() {
 	return AcState::Instance;
 }
 
+void AcState::Destroy() {
+    delete AcState::Instance;
+    Log::Debug() << "AcState::Destroy(): \"AcState::Instance\" destroyed ..." << Log::Endl;
+}
+
 AcState::AcState() {
     this->Setup();
+}
+
+AcState::~AcState() {
+    this->Matrix = nullptr;
+    this->GameMode = nullptr;
+    this->LocalPlayer = nullptr;
+    this->EntityList = nullptr;
+    this->PlayerCount = nullptr;
+
+    this->ModuleBase = NULL;
 }
 
 bool AcState::IsReady() {
@@ -29,7 +44,7 @@ void AcState::Setup() {
 }
 
 bool AcState::CheckReady() {
-    return this->ModuleBase && this->ModuleOpenGl;
+    return this->ModuleBase;
 }
 
 bool AcState::IsTeamGame() {
@@ -56,12 +71,6 @@ void AcState::LoadModules() {
         Log::Error() << "AcState::LoadModules(): Could not get \"ac_client.exe\" module handle ..." << Log::Endl;
     }
     Log::Debug() << "AcState::LoadModules(): GetModuleHandle(\"ac_client.exe\") => " << (void*)this->ModuleBase << Log::Endl;
-
-    this->ModuleOpenGl = (uintptr_t)GetModuleHandle(L"opengl32.dll");
-    if (! this->ModuleOpenGl) {
-        Log::Error() << "AcState::LoadModules(): Could not get \"opengl32.dll\" module handle ..." << Log::Endl;
-    }
-    Log::Debug() << "AcState::LoadModules(): GetModuleHandle(\"opengl32.dll\") => " << (void*)this->ModuleOpenGl << Log::Endl;
 }
 
 void AcState::UpdateAttributes() {

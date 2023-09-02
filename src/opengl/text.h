@@ -6,8 +6,7 @@
 
 #include "../geometry/geometry.h"
 
-namespace opengl
-{
+namespace opengl {
 	namespace Text {
 		class Font {
 		public:

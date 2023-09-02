@@ -12,6 +12,7 @@ class Menu
 {
 public:
 	Menu(const char* title, std::vector<MenuEntry> entries);
+	~Menu();
 	void Tick();
 
 protected:

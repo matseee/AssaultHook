@@ -8,6 +8,15 @@ Patch::Patch(uintptr_t address, uintptr_t valueOn,
 	this->size = size;
 }
 
+Patch::~Patch() {
+	this->Deactivate();
+	this->address = NULL;
+	this->valueOn = NULL;
+	this->valueOff = NULL;
+	this->size = NULL;
+	this->acState = nullptr;
+}
+
 void Patch::Activate() {
 	Hack::Activate();
 	this->MemPatch();

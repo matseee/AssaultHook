@@ -11,6 +11,12 @@ Menu::Menu(const char* title, std::vector<MenuEntry> entries) {
 	this->selectedIndex = 0;
 }
 
+Menu::~Menu() {
+	for (auto i = 0; i < this->entries.size(); i++) {
+		this->entries[i].hack->Deactivate();
+	}
+}
+
 void Menu::Tick() {
 	this->Input();
 	this->Render();
@@ -84,14 +90,16 @@ void Menu::RenderMenu() {
 			this->openGLFont.Print(posX + 5.0f, currentPosY, opengl::Color::WHITE, "%s", entry.name);
 		}
 		else {
-			this->openGLFont.Print(posX + 5.0f, currentPosY, opengl::Color::LIGHTGRAY, "%s", entry.name);
+			this->openGLFont.Print(posX + 5.0f, currentPosY, opengl::Color::GRAY, "%s", entry.name);
 		}
 
 		if (entry.hack->IsActive()) {
-			this->openGLFont.Print(this->openGLFont.EndText(posX, menuWidth, ((float)strlen("ON") * FONT_WIDTH)), currentPosY, opengl::Color::GREEN, "%s", "ON");
+			const GLubyte* green = (i == this->selectedIndex) ? opengl::Color::GREENLIGHT : opengl::Color::GREEN;
+			this->openGLFont.Print(this->openGLFont.EndText(posX, menuWidth, ((float)strlen("ON") * FONT_WIDTH)), currentPosY, green, "%s", "ON");
 		}
 		else {
-			this->openGLFont.Print(this->openGLFont.EndText(posX, menuWidth, ((float)strlen("OFF") * FONT_WIDTH)), currentPosY, opengl::Color::RED, "%s", "OFF");
+			const GLubyte* red = (i == this->selectedIndex) ? opengl::Color::REDLIGHT : opengl::Color::RED;
+			this->openGLFont.Print(this->openGLFont.EndText(posX, menuWidth, ((float)strlen("OFF") * FONT_WIDTH)), currentPosY, red, "%s", "OFF");
 		}
 	}
 }

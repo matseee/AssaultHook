@@ -1,24 +1,22 @@
 #pragma once
 #include "memory.h"
+#include "hook.h"
 #include "../utils/log.h"
-
-#ifdef _WIN64
-#define DETOUR_MIN_LENGTH		16
-#define DETOUR_JMP_INSTRUCTION	0x08EB0000000215FF
-#else
-#define DETOUR_MIN_LENGTH		5
-#define DETOUR_JMP_INSTRUCTION	0xE9
-#endif
 
 class TrampolineHook
 {
 public:
+	TrampolineHook(const char* cModuleName, const char* cProcName, uintptr_t pDestination, uintptr_t dwLen);
+	TrampolineHook(HMODULE hModule, const char* cProcName, uintptr_t pDestination, uintptr_t dwLen);
 	TrampolineHook(uintptr_t pSource, uintptr_t pDestination, uintptr_t dwLen);
+	~TrampolineHook();
 
-	uintptr_t Create();
-	bool Destroy();
+	bool Activate();
+	bool Deactivate();
+	void Destroy();
 
-	bool CheckAllowed();
+	uintptr_t GetGateway();
+
 protected:
 	uintptr_t pSource;
 	uintptr_t pDestination;
@@ -26,6 +24,17 @@ protected:
 	uintptr_t dwLen;
 	uintptr_t pGateway;
 
+	BYTE stolenBytes[DETOUR_MIN_LENGTH*2];
+
+	bool isGatewayCreated = false;
+	bool isDetourCreated = false;
+
+	void Create();
+
+	bool CheckParameterValid();
 	bool CreateGateway();
-	bool Detour();
+	bool CreateDetour();
+
+	bool ReleaseGateway();
+	bool ResetDetour();
 };

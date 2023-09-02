@@ -10,6 +10,13 @@ public:
         this->value = value;
     };
 
+    inline ~Freeze() {
+        this->Deactivate();
+        this->address = NULL;
+        this->value = NULL;
+	    this->acState = nullptr;
+    }
+
     inline void Tick() {
 		if (!this->IsActive()) {
 			return;
@@ -27,6 +34,7 @@ protected:
 class Patch : public Hack {
 public:
     Patch(uintptr_t address, uintptr_t valueOn, uintptr_t valueOff, unsigned long size);
+    ~Patch();
     void Activate();
     void Deactivate();
 protected:

@@ -8,6 +8,7 @@ class Hack
 public:
 	Hack() : Hack(false, nullptr) {};
 	Hack(bool isActive, ActiveChangedCallback callback);
+	~Hack();
 	virtual void Activate();
 	virtual void Deactivate();
 

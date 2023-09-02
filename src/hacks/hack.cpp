@@ -6,6 +6,11 @@ Hack::Hack(bool isActive, ActiveChangedCallback callback) {
 	this->acState = AcState::Get();
 }
 
+Hack::~Hack() {
+	this->Deactivate();
+	this->acState = nullptr;
+}
+
 void Hack::Activate() {
 	this->isActive = true;
 	this->CallActiveChangedCallback();

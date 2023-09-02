@@ -9,6 +9,8 @@ class AcState
 {
 public:
 	static AcState* Get();
+	static void Destroy();
+
 	bool IsReady();
 	void UpdateAttributes();
 
@@ -17,7 +19,6 @@ public:
 	bool IsValidEntity(AcEntity* entity);
 
 	uintptr_t ModuleBase = NULL;
-	uintptr_t ModuleOpenGl = NULL;
 
 	int* GameMode = nullptr;
 	int* PlayerCount = nullptr;
@@ -27,7 +28,10 @@ public:
 
 protected:
 	static AcState* Instance;
+
 	AcState();
+	~AcState();
+
 	void Setup();
 	bool CheckReady();
 	void LoadModules();

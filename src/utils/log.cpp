@@ -35,6 +35,10 @@ void Log::SetActive(bool active) {
 	}
 }
 
+void Log::Destroy() {
+	 delete Log::Instance;
+}
+
 void Log::CreateIfNotExist() {
 	if (!Log::Instance) {
 		Log::Instance = new Log();
@@ -45,6 +49,12 @@ Log::Log() {
 	Log::IsActive = false;
 	Log::ConsoleStream = nullptr;
 	Log::NullStream.open("nul", std::ofstream::out | std::ofstream::app);
+}
+
+Log::~Log() {
+	Log::DeallocateConsole();
+	Log::NullStream.close();
+	delete Log::ConsoleStream;
 }
 
 void Log::AllocateConsole() {

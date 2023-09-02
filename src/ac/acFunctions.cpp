@@ -17,7 +17,7 @@ void AcIntersectGeometry(const vec& from, vec& to) {
 }
 
 // Wrapper for AssaultCubes original "intersectclosest" function (at = LocalPlayer) - I thought that I can use this function as my TraceLine-
-// Function but It only searches for the first player in the "line". It doesn't recognize walls...
+// Function but It only searches for the first player in the "line". It only recognizes PhysEnts and none other game objects...
 // int __usercall IntersectClosest@<eax>(int to@<edx>, int at, float* bestdistsquared, _DWORD* hitzone, char aAiming) <= at 0x004CA250
 AcEntity* AcIntersectClosest(const vec& from, const vec& to, const AcEntity* at, float& bestdistsquared, int& hitzone, bool aiming) {
 	DWORD fIntersectClosest = ADDR_INTERSECTCLOSEST_FUNCTION;

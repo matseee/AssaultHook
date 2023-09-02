@@ -13,7 +13,6 @@ enum LogLevel {
 class Log
 {
 public:
-
 	static std::ostream& Print(LogLevel level);
 	static std::ostream& Debug() { return Log::Print(LOG_DEBUG); };
 	static std::ostream& Info() { return Log::Print(LOG_INFO); };
@@ -23,11 +22,13 @@ public:
 	static std::ostream& Endl(std::ostream& ostream);
 
 	static void SetActive(bool active);
+	static void Destroy();
 
 protected:
 	static Log* Instance;
 
 	Log();
+	~Log();
 	
 	static void CreateIfNotExist();
 
