@@ -16,11 +16,11 @@ After the AssaultHook-DLL is injected into the game, a new thread is created. In
 | Aimbot | loop over the entitiy list; check if the entity is alive; check if the entity is visible, by calling the trace line function from assault cube; calculate the needed viewing angles; set the viewing angles |
 
 
-![Screenshot](./img/screen.png "screenshot")
+![Screenshot](./img/screen.gif "screenshot")
 
 ## Used tools
 - [CheatEngine](https://cheatengine.org/)
-- [ghidra](https://github.com/NationalSecurityAgency/ghidra)
+- [IDA Free](https://hex-rays.com/ida-free/)
 - [ReClass.net](https://github.com/ReClassNET/ReClass.NET)
 - [Visual Studio 2022](https://visualstudio.microsoft.com/de/)
 - [x64dbg](https://x64dbg.com/)
