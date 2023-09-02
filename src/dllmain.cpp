@@ -27,24 +27,24 @@ BOOL __stdcall HookedWglSwapBuffers(HDC hDc) {
 	menu->Tick();
 
 	if (GetAsyncKeyState(VK_DELETE) & 1) {
-		Log::Get()->SetActive(false);
+		Log::SetActive(false);
 		trampolineHook->Destroy();
-		FreeLibraryAndExitThread((HINSTANCE)hThread, 1);
+		FreeLibraryAndExitThread((HINSTANCE)hThread, 0);
 	}
 
 	return wglSwapBuffers(hDc);
 }
 
-// thread that creates the game hacking instances and hooks the opengl wglSawpBuffers function
+// thread that creates the game hacking objects and hooks the opengl wglSawpBuffers function
 DWORD __stdcall Thread(HMODULE hModule) {
 	hThread = hModule;
 
-	Log::Get()->SetActive(true);
-	Log::Info() << "DllMain::Thread(): Started ..." << std::endl;
+	Log::SetActive(true);
+	Log::Info() << "DllMain::Thread(): Initialization started ..." << Log::Endl;
 
 	AcState* acState = AcState::Get();
 	while (!acState->IsReady()) {
-		Log::Warning() << "DllMain::Thread(): AcState not ready ... trying again ..." << std::endl;
+		Log::Warning() << "DllMain::Thread(): AcState not ready ... trying again ..." << Log::Endl;
 	}
 
 	std::vector<MenuEntry> menuEntries = {
@@ -82,7 +82,7 @@ DWORD __stdcall Thread(HMODULE hModule) {
 		},
 		MenuEntry{
 			"Debug Log",
-			new Hack(true, [](bool active) { Log::Get()->SetActive(active); })
+			new Hack(true, [](bool active) { Log::SetActive(active); })
 		}
 	};
 
@@ -90,14 +90,21 @@ DWORD __stdcall Thread(HMODULE hModule) {
 
 	wglSwapBuffers = (twglSwapBuffers)GetProcAddress((HMODULE)acState->ModuleOpenGl, "wglSwapBuffers");
 	if (!wglSwapBuffers) {
-		Log::Error() << "DllMain::Thread(): Could not get \"wglSwapBuffers\" address ..." << std::endl;
+		Log::Error() << "DllMain::Thread(): Could not get \"wglSwapBuffers\" address ..." << Log::Endl;
 	}
-	Log::Debug() << "DllMain::Thread(): GetProcAddress(\"wglSwapBuffers\") => " << (void*)wglSwapBuffers << std::endl;
+	Log::Debug() << "DllMain::Thread(): GetProcAddress(\"wglSwapBuffers\") => " << (void*)wglSwapBuffers << Log::Endl;
 
-	trampolineHook = new TrampolineHook((BYTE*)wglSwapBuffers, (BYTE*)HookedWglSwapBuffers, 5);
+	trampolineHook = new TrampolineHook((uintptr_t)wglSwapBuffers, (uintptr_t)HookedWglSwapBuffers, 5);
 	wglSwapBuffers = (twglSwapBuffers)trampolineHook->Create();
 
-	Log::Info() << "DllMain::Thread(): Finished ..." << std::endl;
+	Log::Info() << "DllMain::Thread(): Initialization finished ..." << Log::Endl;
+
+	while (true) {
+		Log::Debug() << "Dll::Thread(): Still alive ..." << Log::Endl;
+		// Sleep so that the usage of this thread is not 100%
+		Sleep(500);
+	}
+
 	return 0;
 }
 

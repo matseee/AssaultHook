@@ -13,18 +13,18 @@
 class TrampolineHook
 {
 public:
-	TrampolineHook(BYTE* pSource, BYTE* pDestination, uintptr_t dwLen);
+	TrampolineHook(uintptr_t pSource, uintptr_t pDestination, uintptr_t dwLen);
 
-	BYTE* Create();
+	uintptr_t Create();
 	bool Destroy();
 
 	bool CheckAllowed();
 protected:
-	BYTE* pSource;
-	BYTE* pDestination;
+	uintptr_t pSource;
+	uintptr_t pDestination;
 	
 	uintptr_t dwLen;
-	BYTE* pGateway;
+	uintptr_t pGateway;
 
 	bool CreateGateway();
 	bool Detour();

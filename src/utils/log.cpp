@@ -2,66 +2,69 @@
 
 Log* Log::Instance = nullptr;
 
-Log* Log::Get() {
-	if (!Log::Instance) {
-		Log::Instance = new Log();
-	}
-	return Log::Instance;
-}
+bool Log::IsActive;
+FILE* Log::ConsoleStream;
+std::ofstream Log::NullStream;
 
 std::ostream& Log::Print(LogLevel level) {
-	return std::cout << Log::GetTimestamp() << " - " << Log::LogLevelToString(level) << " - ";
+	Log::CreateIfNotExist();
+	
+	if (Log::IsActive && Log::ConsoleStream) {
+		return std::cout << Log::GetTimestamp() << " - " << Log::LogLevelToString(level) << " - ";
+	}
+
+	return Log::NullStream;
 }
 
-Log::Log() {
-	this->isActive = false;
-	this->isConsoleAllocated = false;
-	this->fpConsoleOutput = nullptr;
+std::ostream& Log::Endl(std::ostream& ostream) { 
+	return std::endl(ostream);
 }
 
 void Log::SetActive(bool active) {
-	if (this->isActive == active) {
+	Log::CreateIfNotExist();
+
+	if (Log::IsActive == active) {
 		return;
 	}
 
-	this->isActive = active;
-	if (this->isActive) {
-		this->AllocateConsole();
+	Log::IsActive = active;
+	if (Log::IsActive) {
+		Log::AllocateConsole();
 	} else {
-		this->DeallocateConsole();
+		Log::DeallocateConsole();
 	}
+}
+
+void Log::CreateIfNotExist() {
+	if (!Log::Instance) {
+		Log::Instance = new Log();
+	}
+}
+
+Log::Log() {
+	Log::IsActive = false;
+	Log::ConsoleStream = nullptr;
+	Log::NullStream.open("nul", std::ofstream::out | std::ofstream::app);
 }
 
 void Log::AllocateConsole() {
-	if (this->isConsoleAllocated) {
+	if (Log::ConsoleStream) {
 		return;
 	}
 
-	if (!AllocConsole()) {
-		return;
-	}
-
-	if (freopen_s(&this->fpConsoleOutput, "CONOUT$", "w", stdout)) {
-		return;
-	}
-
-	this->isConsoleAllocated = true;
+	AllocConsole();
+	freopen_s(&Log::ConsoleStream, "CONOUT$", "w", stdout);
 }
 
 void Log::DeallocateConsole() {
-	if (!this->isConsoleAllocated) {
+	if (!Log::ConsoleStream) {
 		return;
 	}
 
-	if (fclose(this->fpConsoleOutput)) {
-		return;
-	}
+	FreeConsole();
+	fclose(Log::ConsoleStream);
 
-	if (!FreeConsole()) {
-		return;
-	}
-
-	this->isConsoleAllocated = false;
+	Log::ConsoleStream = nullptr;
 }
 
 std::string Log::GetTimestamp() {

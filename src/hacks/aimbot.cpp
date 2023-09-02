@@ -7,7 +7,7 @@ void Aimbot::Tick() {
 
 	AcEntity* entity = this->GetBestEntity();
 	if (!entity) {
-		Log::Debug() << "Aimbot::GetBestEntity(): No entity found!" << std::endl;
+		Log::Debug() << "Aimbot::GetBestEntity(): No entity found!" << Log::Endl;
 		return;
 	}
 
@@ -16,7 +16,7 @@ void Aimbot::Tick() {
 
 AcEntity* Aimbot::GetBestEntity() {
 	if (!this->acState->EntityList || !this->acState->EntityList->Entities) {
-		Log::Warning() << "Aimbot::GetBestEntity(): \"acState->EntityList\" not available ..." << std::endl;
+		Log::Warning() << "Aimbot::GetBestEntity(): \"acState->EntityList\" not available ..." << Log::Endl;
 		this->acState->UpdateAttributes();
 		return nullptr;
 	}

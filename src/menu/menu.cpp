@@ -19,7 +19,7 @@ void Menu::Tick() {
 void Menu::Input() {
 	if (GetAsyncKeyState(VK_INSERT) & 1) {
 		this->isOpen = !this->isOpen;
-		Log::Debug() << "Menu::Input(): Menu => " << (this->isOpen ? "ON" : "OFF") << std::endl;
+		Log::Debug() << "Menu::Input(): Menu => " << (this->isOpen ? "ON" : "OFF") << Log::Endl;
 	}
 	if (!this->isOpen) {
 		return;
@@ -39,11 +39,11 @@ void Menu::Input() {
 	this->selectedEntry = this->entries[this->selectedIndex];
 	if (GetAsyncKeyState(VK_LEFT) & 1 && this->selectedEntry.hack->IsActive()) {
 		this->selectedEntry.hack->Deactivate();
-		Log::Debug() << "Menu::Input(): " << this->selectedEntry.name << " => OFF" << std::endl;
+		Log::Debug() << "Menu::Input(): " << this->selectedEntry.name << " => OFF" << Log::Endl;
 	}
 	if (GetAsyncKeyState(VK_RIGHT) & 1 && !this->selectedEntry.hack->IsActive()) {
 		this->selectedEntry.hack->Activate();
-		Log::Debug() << "Menu::Input(): " << this->selectedEntry.name << " => ON" << std::endl;
+		Log::Debug() << "Menu::Input(): " << this->selectedEntry.name << " => ON" << Log::Endl;
 	}
 }
 

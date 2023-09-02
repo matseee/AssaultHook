@@ -4,9 +4,9 @@ AcState* AcState::Instance;
 
 AcState* AcState::Get() {
     if (!AcState::Instance) {
-        Log::Debug() << "AcState::Get(): No \"AcState::Instance\" found. Creating one ..." << std::endl;
+        Log::Debug() << "AcState::Get(): No \"AcState::Instance\" found. Creating one ..." << Log::Endl;
         AcState::Instance = new AcState();
-        Log::Debug() << "AcState::Get(): Creation done ..." << std::endl;
+        Log::Debug() << "AcState::Get(): Creation done ..." << Log::Endl;
     }
 	return AcState::Instance;
 }
@@ -25,7 +25,7 @@ bool AcState::IsReady() {
 void AcState::Setup() {
     this->LoadModules();
     this->UpdateAttributes();
-    Log::Debug() << "AcState::Setup(): Done ..." << std::endl;
+    Log::Debug() << "AcState::Setup(): Done ..." << Log::Endl;
 }
 
 bool AcState::CheckReady() {
@@ -53,20 +53,20 @@ bool AcState::IsValidEntity(AcEntity* entity) {
 void AcState::LoadModules() {
     this->ModuleBase = (uintptr_t)GetModuleHandle(L"ac_client.exe");
     if (!this->ModuleBase) {
-        Log::Error() << "AcState::LoadModules(): Could not get \"ac_client.exe\" module handle ..." << std::endl;
+        Log::Error() << "AcState::LoadModules(): Could not get \"ac_client.exe\" module handle ..." << Log::Endl;
     }
-    Log::Debug() << "AcState::LoadModules(): GetModuleHandle(\"ac_client.exe\") => " << (void*)this->ModuleBase << std::endl;
+    Log::Debug() << "AcState::LoadModules(): GetModuleHandle(\"ac_client.exe\") => " << (void*)this->ModuleBase << Log::Endl;
 
     this->ModuleOpenGl = (uintptr_t)GetModuleHandle(L"opengl32.dll");
     if (! this->ModuleOpenGl) {
-        Log::Error() << "AcState::LoadModules(): Could not get \"opengl32.dll\" module handle ..." << std::endl;
+        Log::Error() << "AcState::LoadModules(): Could not get \"opengl32.dll\" module handle ..." << Log::Endl;
     }
-    Log::Debug() << "AcState::LoadModules(): GetModuleHandle(\"opengl32.dll\") => " << (void*)this->ModuleOpenGl << std::endl;
+    Log::Debug() << "AcState::LoadModules(): GetModuleHandle(\"opengl32.dll\") => " << (void*)this->ModuleOpenGl << Log::Endl;
 }
 
 void AcState::UpdateAttributes() {
     if (!this->CheckReady()) {
-        Log::Warning() << "AcState::UpdateAttributes(): Not ready! Returned without updating attributes ..." << std::endl;
+        Log::Warning() << "AcState::UpdateAttributes(): Not ready! Returned without updating attributes ..." << Log::Endl;
         return;
     }
     this->Matrix = (float*)(ADDR_MATRIX);
@@ -75,5 +75,5 @@ void AcState::UpdateAttributes() {
     this->EntityList = *((AcEntityList**)(this->ModuleBase + ADDR_ENTITY_LIST));
     this->PlayerCount = (int*)(this->ModuleBase + ADDR_NUM_PLAYERS);
 
-    Log::Debug() << "AcState::UpdateAttributes(): Done ..." << std::endl;
+    Log::Debug() << "AcState::UpdateAttributes(): Done ..." << Log::Endl;
 }
