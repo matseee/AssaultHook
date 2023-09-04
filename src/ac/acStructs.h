@@ -126,17 +126,17 @@ public:
 	int32_t NextUpdate; //0x0000
 	int32_t CurrentPos; //0x0004
 	int32_t NumPos; //0x0008
-	Vector3 Positions[7]; //0x000C
+	geometry::Vector3 Positions[7]; //0x000C
 }; //Size: 0x0060
 
 class AcEntity {
 public:
 	int32_t VTable; //0x0000
-	Vector3 Origin; //0x0004
-	Vector3 Velocity; //0x0010
-	Vector3 DeltaPosition; //0x001C
-	Vector3 NewPosition; //0x0028
-	Vector3 Angle; //0x0034
+	geometry::Vector3 Origin; //0x0004
+	geometry::Vector3 Velocity; //0x0010
+	geometry::Vector3 DeltaPosition; //0x001C
+	geometry::Vector3 NewPosition; //0x0028
+	geometry::Vector3 Angle; //0x0034
 	float PitchVelocity; //0x0040
 	float MaxSpeed; //0x0044
 	int32_t TimeInAir; //0x0048
@@ -225,7 +225,7 @@ public:
 	float NewYaw; //0x03E5
 	float NewPitch; //0x03E9
 	int32_t SmoothMillis; //0x03ED
-	Vector3 Head; //0x03F1
+	geometry::Vector3 Head; //0x03F1
 	bool Ignored; //0x03FD
 	bool Muted; //0x03FE
 	bool NoCorpse; //0x03FF

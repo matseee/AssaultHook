@@ -1,6 +1,6 @@
 #include "geometry.h"
 
-bool WorldToScreen(Vector3 pos, Vector3& screen, float matrix[16], int windowWidth, int windowHeight) {
+bool geometry::WorldToScreen(Vector3 pos, Vector2& screen, float matrix[16], int windowWidth, int windowHeight) {
 	// Matrix-vector Product, multiplying world(eye) coordinates by projection matrix = clipCoords
 	Vector4 clipCoords;
 	clipCoords.x = pos.x * matrix[0] + pos.y * matrix[4] + pos.z * matrix[8] + matrix[12];

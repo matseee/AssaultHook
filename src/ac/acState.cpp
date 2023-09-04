@@ -65,6 +65,7 @@ bool AcState::IsValidEntity(AcEntity* entity) {
 	return entity && entity->VTable == ADDR_ENTITY_VTABLE_TO_COMPARE
 		&& entity->Health > 0;
 }
+
 void AcState::LoadModules() {
     this->ModuleBase = (uintptr_t)GetModuleHandle(L"ac_client.exe");
     if (!this->ModuleBase) {

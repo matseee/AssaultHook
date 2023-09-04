@@ -1,27 +1,26 @@
 #include "esp.h"
 
-void ESPBox::Render(AcEntity* entity, Vector3 screenCoordinates) {
-	float x, y, width, height = 0.f;
-	this->GetScaledEntityBox(entity, screenCoordinates, &x, &y, &height, &width);
-	opengl::Draw::Outline(x, y, width, height, 1.0f, this->GetEntityColor(entity));
+void ESPBox::Render(AcEntity* entity, geometry::Vector2 screenCoordinates) {
+	geometry::Rect rect = geometry::Rect();
+	this->GetScaledEntityBox(entity, screenCoordinates, &rect);
+	opengl::Draw::Outline(rect, 1.0f, this->GetEntityColor(entity));
 }
 
-
-void ESPName::Render(AcEntity* entity, Vector3 screenCoordinates) {
+void ESPName::Render(AcEntity* entity, geometry::Vector2 screenCoordinates) {
 	HDC currentHDC = wglGetCurrentDC();
-	if (!this->openGLFont.bBuilt || currentHDC != this->openGLFont.hdc) {
-		this->openGLFont.Build(ESP_FONT_HEIGHT);
+	if (!this->m_Font.bBuilt || currentHDC != this->m_Font.hdc) {
+		this->m_Font.Build(ESP_FONT_HEIGHT);
 	}
 
-	float x, y, width, height = 0.f;
-	this->GetScaledEntityBox(entity, screenCoordinates, &x, &y, &height, &width);
+	geometry::Rect rect = geometry::Rect();
+	this->GetScaledEntityBox(entity, screenCoordinates, &rect);
 
-	float textX = this->openGLFont.CenterText(x, width, (float)(strlen(entity->Name) * ESP_FONT_WIDTH));
-	float textY = y - ESP_FONT_HEIGHT / 2;
-	this->openGLFont.Print(textX, textY, this->GetEntityColor(entity), "%s", entity->Name);
+	float textX = this->m_Font.CenterText(rect.x, rect.width, (float)(strlen(entity->Name) * ESP_FONT_WIDTH));
+	float textY = rect.y - ESP_FONT_HEIGHT / 2;
+	this->m_Font.Print(textX, textY, this->GetEntityColor(entity), "%s", entity->Name);
 }
 
-void ESPHealth::Render(AcEntity* entity, Vector3 screenCoordinates) {
+void ESPHealth::Render(AcEntity* entity, geometry::Vector2 screenCoordinates) {
 	const GLubyte* color; 
 	if (entity->Health >= 66) {
 		color = opengl::Color::GREEN;
@@ -31,28 +30,25 @@ void ESPHealth::Render(AcEntity* entity, Vector3 screenCoordinates) {
 		color = opengl::Color::RED;
 	}
 
-	float x, y, width, height = 0.f;
-	this->GetScaledEntityBox(entity, screenCoordinates, &x, &y, &height, &width);
+	geometry::Rect rect = geometry::Rect();
+	this->GetScaledEntityBox(entity, screenCoordinates, &rect);
 
-	float tmp = height * entity->Health / 100;
-	y += height - tmp;
-	height = tmp;
-	width = 3.f;
-	x -= 8.f;
+	float tmp = rect.height * entity->Health / 100;
+	rect.y += rect.height - tmp;
+	rect.x -= 8.f;
+	rect.width = 3.f;
+	rect.height = tmp;
 
-	opengl::Draw::FilledRect(x, y, width, height, color);
+	opengl::Draw::FilledRect(rect, color);
 }
 
-void ESPLine::Render(AcEntity* entity, Vector3 screenCoordinates) {
-	Vector2 v2ScreenCoordinates;
-	v2ScreenCoordinates.x = screenCoordinates.x;
-	v2ScreenCoordinates.y = screenCoordinates.y;
+void ESPLine::Render(AcEntity* entity, geometry::Vector2 screenCoordinates) {
+	geometry::Line line = geometry::Line(
+		screenCoordinates,
+		geometry::Point{ (float)this->m_Viewport.height, (float)this->m_Viewport.width / 2 }
+	);
 
-	Vector2 v2PlayerCoordinates;
-	v2PlayerCoordinates.y = (float)this->viewport[3];
-	v2PlayerCoordinates.x = (float)this->viewport[2] / 2;
-
-	opengl::Draw::Line(v2PlayerCoordinates, v2ScreenCoordinates, this->GetEntityColor(entity));
+	opengl::Draw::Line(line, this->GetEntityColor(entity));
 }
 
 void ESPBase::Tick() {
@@ -70,7 +66,7 @@ void ESPBase::LoopOverEntities() {
 		return;
 	}
 
-	glGetIntegerv(GL_VIEWPORT, this->viewport);
+	glGetIntegerv(GL_VIEWPORT, reinterpret_cast<GLint*>(&this->m_Viewport));
 
 	for (int i = 0; i < *this->acState->PlayerCount; i++) {
 		if (!this->acState->IsValidEntity(this->acState->EntityList->Entities[i])) {
@@ -79,11 +75,8 @@ void ESPBase::LoopOverEntities() {
 
 		AcEntity* entity = this->acState->EntityList->Entities[i];
 
-		Vector3 entityCenter = entity->Origin;
-		entityCenter.z = (entityCenter.z + entity->NewPosition.z) / 2;
-
-		Vector3 screenCoordinates;
-		if (WorldToScreen(entityCenter, screenCoordinates, this->acState->Matrix, this->viewport[2], this->viewport[3])) {
+		geometry::Vector2 screenCoordinates;
+		if (geometry::WorldToScreen(entity->Origin, screenCoordinates, this->acState->Matrix, this->m_Viewport.width, this->m_Viewport.height)) {
 			this->Render(entity, screenCoordinates);
 		}
 	}
@@ -97,11 +90,24 @@ float ESPBase::GetDistanceTo(AcEntity* entity) {
 	return this->acState->LocalPlayer->Origin.Distance(entity->Origin);
 }
 
-void ESPBox::GetScaledEntityBox(AcEntity* entity, Vector3 screenCoordinates, float* x, float* y, float* height, float* width) {
-	float scale = (GAME_UNIT_MAGIC / this->GetDistanceTo(entity)) * (this->viewport[2] / VIRTUAL_SCREEN_WIDTH);
-	*x = screenCoordinates.x - scale;
-	*y = screenCoordinates.y - scale * PLAYER_ASPECT_RATIO;
-	*width = scale * 2;
-	*height = scale * PLAYER_ASPECT_RATIO * 2;
+void ESPBox::GetScaledEntityBox(AcEntity* entity, geometry::Vector2 screenCoordinates, geometry::Rect* rect) {
+	glGetIntegerv(GL_VIEWPORT, reinterpret_cast<GLint*>(&this->m_Viewport));
+
+	geometry::Vector3 headWorldPos = geometry::Vector3(entity->Origin.x, entity->Origin.y, entity->Origin.z);
+	headWorldPos.z += 0.8f;
+
+	geometry::Vector3 feetWorldPos = headWorldPos.Copy();
+	feetWorldPos.z -= entity->EyeHeight;
+
+	geometry::Point headScreenPos, feetScreenPos;
+	geometry::WorldToScreen(headWorldPos, headScreenPos, this->acState->Matrix, this->m_Viewport.width, this->m_Viewport.height);
+	geometry::WorldToScreen(feetWorldPos, feetScreenPos, this->acState->Matrix, this->m_Viewport.width, this->m_Viewport.height);
+
+	float squaredDistance = headScreenPos.Distance(feetScreenPos) * 1.2f;
+
+	rect->x = headScreenPos.x - (squaredDistance / 4.0f);
+	rect->y = headScreenPos.y;
+	rect->width = squaredDistance / 2.0f;
+	rect->height = squaredDistance;
 }
 

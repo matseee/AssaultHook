@@ -1,9 +1,9 @@
 #include "opengl.h"
 
 void opengl::SetupOrtho() {
+	GLint viewport[4];
 	glPushAttrib(GL_ALL_ATTRIB_BITS);
 	glPushMatrix();
-	GLint viewport[4];
 	glGetIntegerv(GL_VIEWPORT, viewport);
 	glViewport(0, 0, viewport[2], viewport[3]);
 	glMatrixMode(GL_PROJECTION);

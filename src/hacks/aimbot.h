@@ -12,7 +12,7 @@ protected:
 	AcEntity* GetBestEntity();
 
 	void AimToEntity(AcEntity* entity);
-	Vector3 CalcAngle(AcEntity* entity);
+	geometry::Vector3 CalcAngle(AcEntity* entity);
 	
 	bool IsVisible(AcEntity* entity);
 };

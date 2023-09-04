@@ -8,8 +8,8 @@
 
 namespace opengl {
 	namespace Draw {
-		void Line(Vector2 a, Vector2 b, const GLubyte color[3]);
-		void FilledRect(float x, float y, float width, float height, const GLubyte color[3]);
-		void Outline(float x, float y, float width, float height, float lineWidth, const GLubyte color[3]);
+		void Line(geometry::Line line, const GLubyte color[3]);
+		void FilledRect(geometry::Rect rect, const GLubyte color[3]);
+		void Outline(geometry::Rect rect, float lineWidth, const GLubyte color[3]);
 	}
 }

@@ -19,7 +19,7 @@ namespace opengl {
 			void Build(int height);
 			void Print(float x, float y, const unsigned char color[3], const char* format, ...);
 
-			Vector3 CenterText(float x, float y, float width, float height, float textWidth, float textHeight);
+			geometry::Vector3 CenterText(float x, float y, float width, float height, float textWidth, float textHeight);
 			float CenterText(float x, float width, float textWidth);
 			float EndText(float x, float width, float textWidth);
 		};

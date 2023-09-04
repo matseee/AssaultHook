@@ -14,7 +14,7 @@
 
 bool bDestroy = false;
 HMODULE hThread = nullptr;
-const char titleAssaultHook[] = "AssaultHook v1.0";
+const char titleAssaultHook[] = " >> AssaultHook <<";
 
 AcState* acState = nullptr;
 Menu* menu = nullptr;
@@ -61,38 +61,42 @@ DWORD __stdcall Thread(HMODULE hModule) {
 		Sleep(50);
 	}
 
-	menu = new Menu(titleAssaultHook,
-		std::vector<MenuEntry> {
-			MenuEntry{ "Aimbot", new Aimbot() },
-			MenuEntry{ "ESP Box", new ESPBox() },
-			MenuEntry{ "ESP Name", new ESPName() },
-			MenuEntry{ "ESP Health", new ESPHealth() },
-			MenuEntry{ "ESP Line", new ESPLine() },
-			MenuEntry{ "Unl. Health",
-				new Freeze<int>(
-					(uintptr_t)&acState->LocalPlayer->Health,
-					69420
-				)
-			},
-			MenuEntry{ "Unl. Ammo",
-				new Freeze<int>(
-					(uintptr_t)memory::FindDMAAddress(acState->ModuleBase + ADDR_FIRST_WEAPON_AMMO, OFF_FIRST_WEAPON_AMMO),
-					69420
-				),
-			},
-			MenuEntry{ "No Recoil",
-				// instead of running the original calculateRecoil function, return directly
-				new Patch(
-					(uintptr_t)ADDR_NORECOIL_FUNCTION,
-					(uintptr_t)"\xC2\x08\x00", // ac_client.exe+C8BA0 - C2 08 00              - ret 0008 { 8 }
-					(uintptr_t)"\x83\xEC\x28", // ac_client.exe+C8BA0 - 83 EC 28              - sub esp,28
-					3
-				)
-			},
-			MenuEntry{ "Debug Log",
-				new Hack(true, [](bool active) { Log::SetActive(active); })
-			}
-		});
+	menu = new Menu(std::vector<MenuEntry> {
+		MenuEntry{ ">> AssaultHook <<", nullptr, MenuEntryType::TITLE },
+		MenuEntry{ "", nullptr, MenuEntryType::SPACER },
+		MenuEntry{ "Aimbot", new Aimbot() },
+		MenuEntry{ "", nullptr, MenuEntryType::SPACER },
+		MenuEntry{ "ESP Box", new ESPBox() },
+		MenuEntry{ "ESP Name", new ESPName() },
+		MenuEntry{ "ESP Health", new ESPHealth() },
+		MenuEntry{ "ESP Line", new ESPLine() },
+		MenuEntry{ "", nullptr, MenuEntryType::SPACER },
+		MenuEntry{ "Unl. Health",
+			new Freeze<int>(
+				(uintptr_t)&acState->LocalPlayer->Health,
+				69420
+			)
+		},
+		MenuEntry{ "Unl. Ammo",
+			new Freeze<int>(
+				(uintptr_t)memory::FindDMAAddress(acState->ModuleBase + ADDR_FIRST_WEAPON_AMMO, OFF_FIRST_WEAPON_AMMO),
+				69420
+			),
+		},
+		MenuEntry{ "No Recoil",
+			// instead of running the original calculateRecoil function, return directly
+			new Patch(
+				(uintptr_t)ADDR_NORECOIL_FUNCTION,
+				(uintptr_t)"\xC2\x08\x00", // ac_client.exe+C8BA0 - C2 08 00              - ret 0008 { 8 }
+				(uintptr_t)"\x83\xEC\x28", // ac_client.exe+C8BA0 - 83 EC 28              - sub esp,28
+				3
+			)
+		},
+		MenuEntry{ "", nullptr, MenuEntryType::SPACER },
+		MenuEntry{ "Debug Log",
+			new Hack(true, [](bool active) { Log::SetActive(active); })
+		}
+	});
 
 	trampolineHook = new TrampolineHook("opengl32.dll", "wglSwapBuffers", (uintptr_t)HookedWglSwapBuffers, 5);
 

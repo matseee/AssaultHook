@@ -48,7 +48,7 @@ AcEntity* Aimbot::GetBestEntity() {
 
 bool Aimbot::IsVisible(AcEntity* entity) {
 	AcEntity* localPlayer = this->acState->LocalPlayer;
-	Vector3 tmpTo = entity->Head.x >= 0 ? entity->Head : entity->Origin;
+	geometry::Vector3 tmpTo = entity->Head.x >= 0 ? entity->Head : entity->Origin;
 	vec from = vec(localPlayer->Origin.x, localPlayer->Origin.y, localPlayer->Origin.z);
 	vec to = vec(tmpTo.x, tmpTo.y, tmpTo.z);
 
@@ -57,17 +57,17 @@ bool Aimbot::IsVisible(AcEntity* entity) {
 }
 
 void Aimbot::AimToEntity(AcEntity* entity) {
-	Vector3 angle = this->CalcAngle(entity);
+	geometry::Vector3 angle = this->CalcAngle(entity);
 	this->acState->LocalPlayer->Angle.x = angle.x;
 	this->acState->LocalPlayer->Angle.y = angle.y;
 }
 
-Vector3 Aimbot::CalcAngle(AcEntity* entity) {
-	Vector3 v = entity->Head.x >= 0 ? entity->Head : entity->Origin;
+geometry::Vector3 Aimbot::CalcAngle(AcEntity* entity) {
+	geometry::Vector3 v = entity->Head.x >= 0 ? entity->Head : entity->Origin;
 
 	v = this->acState->LocalPlayer->Origin - v;
 
-	Vector3 angles;
+	geometry::Vector3 angles;
 	angles.x = ::atanf(v.x / v.y) * -57.2957795f;
 	angles.y = ::atanf(v.z / ::sqrtf(v.x * v.x + v.y * v.y)) * -57.2957795f;
 	angles.z = 0.f;
