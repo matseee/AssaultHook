@@ -43,9 +43,11 @@ void ESPHealth::Render(AcEntity* entity, geometry::Vector2 screenCoordinates) {
 }
 
 void ESPLine::Render(AcEntity* entity, geometry::Vector2 screenCoordinates) {
+	glGetIntegerv(GL_VIEWPORT, reinterpret_cast<GLint*>(&this->m_Viewport));
+
 	geometry::Line line = geometry::Line(
 		screenCoordinates,
-		geometry::Point{ (float)this->m_Viewport.height, (float)this->m_Viewport.width / 2 }
+		geometry::Point((float)this->m_Viewport.width / 2, (float)this->m_Viewport.height)
 	);
 
 	opengl::Draw::Line(line, this->GetEntityColor(entity));

@@ -68,7 +68,7 @@ void Menu::RenderMenu() {
 	float currentPosY = MENU_POSITION.y;
 
 	if (!this->m_Font.bBuilt || currentHDC != this->m_Font.hdc) {
-		this->m_Font.Build(FONT_HEIGHT);
+		this->m_Font.Build((int)FONT_HEIGHT);
 	}
 
 	opengl::Draw::FilledRect(menuRect, opengl::Color::BLACK);
