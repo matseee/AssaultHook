@@ -17,10 +17,10 @@ public:
 	bool IsActiveAndReady();
 	
 protected:
-	AcState* acState;
-	bool isActive;
+	AcState* m_AcState;
+	bool m_IsActive;
 
-	ActiveChangedCallback callback;
+	ActiveChangedCallback m_Callback;
 	void CallActiveChangedCallback();
 };
 

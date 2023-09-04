@@ -15,9 +15,9 @@ void Aimbot::Tick() {
 }
 
 AcEntity* Aimbot::GetBestEntity() {
-	if (!this->acState->EntityList || !this->acState->EntityList->Entities) {
-		Log::Warning() << "Aimbot::GetBestEntity(): \"acState->EntityList\" not available ..." << Log::Endl;
-		this->acState->UpdateAttributes();
+	if (!this->m_AcState->EntityList || !this->m_AcState->EntityList->Entities) {
+		Log::Warning() << "Aimbot::GetBestEntity(): \"m_AcState->EntityList\" not available ..." << Log::Endl;
+		this->m_AcState->UpdateAttributes();
 		return nullptr;
 	}
 
@@ -27,17 +27,17 @@ AcEntity* Aimbot::GetBestEntity() {
 	float bestDistance = 0;
 	float distance = 0;
 
-	for (int i = 0; i < *this->acState->PlayerCount; i++) {
-		if (!this->acState->IsValidEntity(this->acState->EntityList->Entities[i])) {
+	for (int i = 0; i < *this->m_AcState->PlayerCount; i++) {
+		if (!this->m_AcState->IsValidEntity(this->m_AcState->EntityList->Entities[i])) {
 			continue;
 		}
 
-		entity = this->acState->EntityList->Entities[i];
-		if (!this->acState->IsEnemy(entity) || !this->IsVisible(entity)) {
+		entity = this->m_AcState->EntityList->Entities[i];
+		if (!this->m_AcState->IsEnemy(entity) || !this->IsVisible(entity)) {
 			continue;
 		}
 
-		distance = this->acState->LocalPlayer->Origin.Distance(entity->Origin);
+		distance = this->m_AcState->LocalPlayer->Origin.Distance(entity->Origin);
 		if (distance < bestDistance || bestDistance == 0) {
 			bestDistance = distance;
 			bestEntity = entity;
@@ -47,7 +47,7 @@ AcEntity* Aimbot::GetBestEntity() {
 }
 
 bool Aimbot::IsVisible(AcEntity* entity) {
-	AcEntity* localPlayer = this->acState->LocalPlayer;
+	AcEntity* localPlayer = this->m_AcState->LocalPlayer;
 	geometry::Vector3 tmpTo = entity->Head.x >= 0 ? entity->Head : entity->Origin;
 	vec from = vec(localPlayer->Origin.x, localPlayer->Origin.y, localPlayer->Origin.z);
 	vec to = vec(tmpTo.x, tmpTo.y, tmpTo.z);
@@ -58,14 +58,14 @@ bool Aimbot::IsVisible(AcEntity* entity) {
 
 void Aimbot::AimToEntity(AcEntity* entity) {
 	geometry::Vector3 angle = this->CalcAngle(entity);
-	this->acState->LocalPlayer->Angle.x = angle.x;
-	this->acState->LocalPlayer->Angle.y = angle.y;
+	this->m_AcState->LocalPlayer->Angle.x = angle.x;
+	this->m_AcState->LocalPlayer->Angle.y = angle.y;
 }
 
 geometry::Vector3 Aimbot::CalcAngle(AcEntity* entity) {
 	geometry::Vector3 v = entity->Head.x >= 0 ? entity->Head : entity->Origin;
 
-	v = this->acState->LocalPlayer->Origin - v;
+	v = this->m_AcState->LocalPlayer->Origin - v;
 
 	geometry::Vector3 angles;
 	angles.x = ::atanf(v.x / v.y) * -57.2957795f;

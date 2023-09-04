@@ -62,34 +62,34 @@ void ESPBase::Tick() {
 }
 
 void ESPBase::LoopOverEntities() {
-	if (!this->acState->EntityList || !this->acState->EntityList->Entities) {
-		Log::Warning() << "ESPBase::LoopOverEntities(): \"acState->EntityList\" not available ..." << Log::Endl;
-		this->acState->UpdateAttributes();
+	if (!this->m_AcState->EntityList || !this->m_AcState->EntityList->Entities) {
+		Log::Warning() << "ESPBase::LoopOverEntities(): \"m_AcState->EntityList\" not available ..." << Log::Endl;
+		this->m_AcState->UpdateAttributes();
 		return;
 	}
 
 	glGetIntegerv(GL_VIEWPORT, reinterpret_cast<GLint*>(&this->m_Viewport));
 
-	for (int i = 0; i < *this->acState->PlayerCount; i++) {
-		if (!this->acState->IsValidEntity(this->acState->EntityList->Entities[i])) {
+	for (int i = 0; i < *this->m_AcState->PlayerCount; i++) {
+		if (!this->m_AcState->IsValidEntity(this->m_AcState->EntityList->Entities[i])) {
 			continue;
 		}
 
-		AcEntity* entity = this->acState->EntityList->Entities[i];
+		AcEntity* entity = this->m_AcState->EntityList->Entities[i];
 
 		geometry::Vector2 screenCoordinates;
-		if (geometry::WorldToScreen(entity->Origin, screenCoordinates, this->acState->Matrix, this->m_Viewport.width, this->m_Viewport.height)) {
+		if (geometry::WorldToScreen(entity->Origin, screenCoordinates, this->m_AcState->Matrix, this->m_Viewport.width, this->m_Viewport.height)) {
 			this->Render(entity, screenCoordinates);
 		}
 	}
 }
 
 const GLubyte* ESPBase::GetEntityColor(AcEntity* entity) {
-	return (this->acState->IsEnemy(entity)) ? opengl::Color::RED : opengl::Color::BLUE;
+	return (this->m_AcState->IsEnemy(entity)) ? opengl::Color::RED : opengl::Color::BLUE;
 }
 
 float ESPBase::GetDistanceTo(AcEntity* entity) {
-	return this->acState->LocalPlayer->Origin.Distance(entity->Origin);
+	return this->m_AcState->LocalPlayer->Origin.Distance(entity->Origin);
 }
 
 void ESPBox::GetScaledEntityBox(AcEntity* entity, geometry::Vector2 screenCoordinates, geometry::Rect* rect) {
@@ -102,8 +102,8 @@ void ESPBox::GetScaledEntityBox(AcEntity* entity, geometry::Vector2 screenCoordi
 	feetWorldPos.z -= entity->EyeHeight;
 
 	geometry::Point headScreenPos, feetScreenPos;
-	geometry::WorldToScreen(headWorldPos, headScreenPos, this->acState->Matrix, this->m_Viewport.width, this->m_Viewport.height);
-	geometry::WorldToScreen(feetWorldPos, feetScreenPos, this->acState->Matrix, this->m_Viewport.width, this->m_Viewport.height);
+	geometry::WorldToScreen(headWorldPos, headScreenPos, this->m_AcState->Matrix, this->m_Viewport.width, this->m_Viewport.height);
+	geometry::WorldToScreen(feetWorldPos, feetScreenPos, this->m_AcState->Matrix, this->m_Viewport.width, this->m_Viewport.height);
 
 	float squaredDistance = headScreenPos.Distance(feetScreenPos) * 1.2f;
 

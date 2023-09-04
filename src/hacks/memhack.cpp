@@ -2,19 +2,19 @@
 
 Patch::Patch(uintptr_t address, uintptr_t valueOn,
 	uintptr_t valueOff, unsigned long size) : Hack() {
-	this->address = address;
-	this->valueOn = valueOn;
-	this->valueOff = valueOff;
-	this->size = size;
+	this->m_Address = address;
+	this->m_ValueOn = valueOn;
+	this->m_ValueOff = valueOff;
+	this->m_Size = size;
 }
 
 Patch::~Patch() {
 	this->Deactivate();
-	this->address = NULL;
-	this->valueOn = NULL;
-	this->valueOff = NULL;
-	this->size = NULL;
-	this->acState = nullptr;
+	this->m_Address = NULL;
+	this->m_ValueOn = NULL;
+	this->m_ValueOff = NULL;
+	this->m_Size = NULL;
+	this->m_AcState = nullptr;
 }
 
 void Patch::Activate() {
@@ -28,5 +28,5 @@ void Patch::Deactivate() {
 }
 
 void Patch::MemPatch() {
-	memory::Patch((BYTE*)this->acState->ModuleBase + this->address, (BYTE*)(this->IsActive() ? this->valueOn : this->valueOff), this->size);
+	memory::Patch((BYTE*)this->m_AcState->ModuleBase + this->m_Address, (BYTE*)(this->IsActive() ? this->m_ValueOn : this->m_ValueOff), this->m_Size);
 }

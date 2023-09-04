@@ -1,38 +1,38 @@
 #include "hack.h"
 
 Hack::Hack(bool isActive, ActiveChangedCallback callback) {
-	this->isActive = isActive;
-	this->callback = callback;
-	this->acState = AcState::Get();
+	this->m_IsActive = isActive;
+	this->m_Callback = callback;
+	this->m_AcState = AcState::Get();
 }
 
 Hack::~Hack() {
 	this->Deactivate();
-	this->acState = nullptr;
+	this->m_AcState = nullptr;
 }
 
 void Hack::Activate() {
-	this->isActive = true;
+	this->m_IsActive = true;
 	this->CallActiveChangedCallback();
 }
 
 void Hack::Deactivate() {
-	this->isActive = false;
+	this->m_IsActive = false;
 	this->CallActiveChangedCallback();
 }
 
 bool Hack::IsActive() {
-	return this->isActive;
+	return this->m_IsActive;
 }
 
 bool Hack::IsActiveAndReady() {
-	return this->isActive && this->acState && this->acState->IsReady();
+	return this->m_IsActive && this->m_AcState && this->m_AcState->IsReady();
 }
 
 void Hack::Tick() {}
 
 void Hack::CallActiveChangedCallback() {
-	if (this->callback) {
-		this->callback(this->isActive);
+	if (this->m_Callback) {
+		this->m_Callback(this->m_IsActive);
 	}
 }
