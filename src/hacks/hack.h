@@ -1,5 +1,6 @@
 #pragma once
 #include "../ac/acState.h"
+#include "../memory/memory.h"
 
 typedef void(*ActiveChangedCallback)(bool);
 

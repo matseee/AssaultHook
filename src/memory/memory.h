@@ -3,7 +3,8 @@
 #include <vector>
 
 namespace memory {
-	void Patch(BYTE* dst, BYTE* src, unsigned int size);
-	void Nop(BYTE* dst, unsigned int size);
+	bool PatchBytes(BYTE* destination, BYTE* source, unsigned int size);
+	void ReadBytes(BYTE* source, BYTE* destination, unsigned int size);
+	void NopBytes(BYTE* destination, unsigned int size);
 	uintptr_t FindDMAAddress(uintptr_t ptr, std::vector<unsigned int> offsets);
 }

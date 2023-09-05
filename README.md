@@ -13,17 +13,17 @@ After the AssaultHook-DLL is injected into the game, a new thread is created. In
 | ESP Name | same as esp; but render the name over the entity |
 | ESP Health | same as esp; but render a filled rect that changes color and decreases in size when the health drops |
 | ESP Line | same as esp; but render a line to the entity |
-| Unlimited health | set integer every tick |
-| Unlimted ammo | set integer every tick |
+| Unlimited health | hook `dodamage` function; set damage to 0 if the this-pointer is equal to the `LocalPlayerState` |
+| Unlimted ammo | overwrite decrease ammo instructions with `nop` instructions |
 | No recoil | overwrite instructions: instead of calculate the recoil just return directly |
 
 ![Screenshot](./img/screen.gif "screenshot")
 
 ## Used tools
-- [CheatEngine](https://cheatengine.org/)
 - [IDA Free](https://hex-rays.com/ida-free/)
-- [ReClass.net](https://github.com/ReClassNET/ReClass.NET)
 - [Visual Studio 2022](https://visualstudio.microsoft.com/de/)
+- [CheatEngine](https://cheatengine.org/)
+- [ReClass.net](https://github.com/ReClassNET/ReClass.NET)
 - [x64dbg](https://x64dbg.com/)
 
 ## Credits

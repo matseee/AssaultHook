@@ -151,7 +151,7 @@ bool TrampolineHook::ResetDetour() {
 		return true;
 	}
 
-	memory::Patch((BYTE*)this->pSource, (BYTE*)this->stolenBytes, this->dwLen);
+	memory::PatchBytes((BYTE*)this->pSource, (BYTE*)this->stolenBytes, this->dwLen);
 	this->isDetourCreated = false;
 	return true;
 }

@@ -5,6 +5,7 @@
 #include "memory/memory.h"
 
 #include "hacks/aimbot.h"
+#include "hacks/health.h"
 #include "hacks/memhack.h"
 #include "hacks/esp.h"
 
@@ -71,24 +72,21 @@ DWORD __stdcall Thread(HMODULE hModule) {
 		MenuEntry{ "ESP Health", new ESPHealth() },
 		MenuEntry{ "ESP Line", new ESPLine() },
 		MenuEntry{ "", nullptr, MenuEntryType::SPACER },
-		MenuEntry{ "Unl. Health",
-			new Freeze<int>(
-				(uintptr_t)&acState->LocalPlayer->Health,
-				69420
-			)
-		},
+		MenuEntry{ "Unl. Health", new Health() },
 		MenuEntry{ "Unl. Ammo",
-			new Freeze<int>(
-				(uintptr_t)memory::FindDMAAddress(acState->ModuleBase + ADDR_FIRST_WEAPON_AMMO, OFF_FIRST_WEAPON_AMMO),
-				69420
+			new Patch(
+				(uintptr_t)(acState->ModuleBase + ADDR_DECREASE_AMMO_FUNCTION),
+				(uintptr_t)"\x90\x90", // ac_client.exe+C73EF - 90 90    - nop
+				(uintptr_t)"\xFF\x08", // ac_client.exe+C73EF - FF 08    - dec[eax]
+				2
 			),
 		},
 		MenuEntry{ "No Recoil",
 			// instead of running the original calculateRecoil function, return directly
 			new Patch(
-				(uintptr_t)ADDR_NORECOIL_FUNCTION,
-				(uintptr_t)"\xC2\x08\x00", // ac_client.exe+C8BA0 - C2 08 00              - ret 0008 { 8 }
-				(uintptr_t)"\x83\xEC\x28", // ac_client.exe+C8BA0 - 83 EC 28              - sub esp,28
+				(uintptr_t)(acState->ModuleBase + ADDR_NORECOIL_FUNCTION),
+				(uintptr_t)"\xC2\x08\x00", // ac_client.exe+C8BA0 - C2 08 00    - ret 0008 { 8 }
+				(uintptr_t)"\x83\xEC\x28", // ac_client.exe+C8BA0 - 83 EC 28    - sub esp,28
 				3
 			)
 		},

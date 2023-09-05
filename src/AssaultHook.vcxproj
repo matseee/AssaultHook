@@ -145,6 +145,7 @@
     <ClInclude Include="ac\acFunctions.h" />
     <ClInclude Include="ac\acState.h" />
     <ClInclude Include="ac\acStructs.h" />
+    <ClInclude Include="hacks\health.h" />
     <ClInclude Include="memory\hook.h" />
     <ClInclude Include="opengl\opengl.h" />
     <ClInclude Include="geometry\geometry.h" />
@@ -167,6 +168,7 @@
     <ClCompile Include="hacks\aimbot.cpp" />
     <ClCompile Include="hacks\esp.cpp" />
     <ClCompile Include="hacks\hack.cpp" />
+    <ClCompile Include="hacks\health.cpp" />
     <ClCompile Include="hacks\memhack.cpp" />
     <ClCompile Include="memory\hook.cpp" />
     <ClCompile Include="memory\memory.cpp" />

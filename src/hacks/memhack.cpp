@@ -28,5 +28,5 @@ void Patch::Deactivate() {
 }
 
 void Patch::MemPatch() {
-	memory::Patch((BYTE*)this->m_AcState->ModuleBase + this->m_Address, (BYTE*)(this->IsActive() ? this->m_ValueOn : this->m_ValueOff), this->m_Size);
+	memory::PatchBytes((BYTE*)this->m_Address, (BYTE*)(this->IsActive() ? this->m_ValueOn : this->m_ValueOff), this->m_Size);
 }
