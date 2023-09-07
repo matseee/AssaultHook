@@ -11,6 +11,6 @@
 #define ASM_INSTRUCTION_JMP		0xE9
 #endif
 
-namespace hook {
-	bool Detour(uintptr_t pSource, uintptr_t pDestination, uintptr_t pLength, uintptr_t pSourcePadding = 0);
+namespace memory {
+	bool Hook(uintptr_t pSource, uintptr_t pDestination, uintptr_t pLength, uintptr_t pSourcePadding = 0);
 }

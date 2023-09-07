@@ -1,6 +1,8 @@
 #include "hook.h"
 
-bool hook::Detour(uintptr_t pSource, uintptr_t pDestination, uintptr_t pLength, uintptr_t pSourcePadding) {
+// also called detour - we simply overwrite some instructions of the targets process with an unconditional
+// jump (JMP) to manipulate the program flow to our needs.
+bool memory::Hook(uintptr_t pSource, uintptr_t pDestination, uintptr_t pLength, uintptr_t pSourcePadding) {
 	if (!pSource || !pDestination || pLength < DETOUR_MIN_LENGTH) {
 		return false;
 	}

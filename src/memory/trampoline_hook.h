@@ -3,38 +3,39 @@
 #include "hook.h"
 #include "../utils/log.h"
 
-class TrampolineHook
-{
-public:
-	TrampolineHook(const char* cModuleName, const char* cProcName, uintptr_t pDestination, uintptr_t dwLen);
-	TrampolineHook(HMODULE hModule, const char* cProcName, uintptr_t pDestination, uintptr_t dwLen);
-	TrampolineHook(uintptr_t pSource, uintptr_t pDestination, uintptr_t dwLen);
-	~TrampolineHook();
+namespace memory {
+	class TrampolineHook {
+	public:
+		TrampolineHook(const char* cModuleName, const char* cProcName, uintptr_t pDestination, uintptr_t dwLen);
+		TrampolineHook(HMODULE hModule, const char* cProcName, uintptr_t pDestination, uintptr_t dwLen);
+		TrampolineHook(uintptr_t pSource, uintptr_t pDestination, uintptr_t dwLen);
+		~TrampolineHook();
 
-	bool Activate();
-	bool Deactivate();
-	void Destroy();
+		bool Activate();
+		bool Deactivate();
+		void Destroy();
 
-	uintptr_t GetGateway();
+		uintptr_t GetGateway();
 
-protected:
-	uintptr_t pSource;
-	uintptr_t pDestination;
-	
-	uintptr_t dwLen;
-	uintptr_t pGateway;
+	protected:
+		uintptr_t pSource;
+		uintptr_t pDestination;
 
-	BYTE stolenBytes[DETOUR_MIN_LENGTH*2];
+		uintptr_t dwLen;
+		uintptr_t pGateway;
 
-	bool isGatewayCreated = false;
-	bool isDetourCreated = false;
+		BYTE stolenBytes[DETOUR_MIN_LENGTH * 2];
 
-	void Create();
+		bool isGatewayCreated = false;
+		bool isDetourCreated = false;
 
-	bool CheckParameterValid();
-	bool CreateGateway();
-	bool CreateDetour();
+		void Create();
 
-	bool ReleaseGateway();
-	bool ResetDetour();
+		bool CheckParameterValid();
+		bool CreateGateway();
+		bool CreateDetour();
+
+		bool ReleaseGateway();
+		bool ResetDetour();
+	};
 };

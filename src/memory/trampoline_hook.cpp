@@ -1,12 +1,12 @@
 #include "trampoline_hook.h"
 
-TrampolineHook::TrampolineHook(const char* cModuleName, const char* cProcName, uintptr_t pDestination, uintptr_t dwLen) 
+memory::TrampolineHook::TrampolineHook(const char* cModuleName, const char* cProcName, uintptr_t pDestination, uintptr_t dwLen) 
 	: TrampolineHook(GetModuleHandleA(cModuleName), cProcName, pDestination, dwLen) { }
 
-TrampolineHook::TrampolineHook(HMODULE hModule, const char* cProcName, uintptr_t pDestination, uintptr_t dwLen) 
+memory::TrampolineHook::TrampolineHook(HMODULE hModule, const char* cProcName, uintptr_t pDestination, uintptr_t dwLen) 
 	: TrampolineHook((uintptr_t)GetProcAddress(hModule, cProcName), pDestination, dwLen) { }
 
-TrampolineHook::TrampolineHook(uintptr_t pSource, uintptr_t pDestination, uintptr_t dwLen) {
+memory::TrampolineHook::TrampolineHook(uintptr_t pSource, uintptr_t pDestination, uintptr_t dwLen) {
 	this->pSource = pSource;
 	this->pDestination = pDestination;
 	this->dwLen = dwLen;
@@ -15,12 +15,12 @@ TrampolineHook::TrampolineHook(uintptr_t pSource, uintptr_t pDestination, uintpt
 	this->Create();
 }
 
-TrampolineHook::~TrampolineHook() {
+memory::TrampolineHook::~TrampolineHook() {
 	this->Destroy();
 }
 
 // creates the detour (source -> destination) when a gateway is available
-bool TrampolineHook::Activate() {
+bool memory::TrampolineHook::Activate() {
 	if (!this->isGatewayCreated || !this->pGateway) {
 		Log::Error() << "TrampolineHook::Activate(): Gateway is not created ..." << Log::Endl;
 		return false;
@@ -35,9 +35,9 @@ bool TrampolineHook::Activate() {
 }
 
 // only deactivate the detour (source -> destination)
-bool TrampolineHook::Deactivate() {
+bool memory::TrampolineHook::Deactivate() {
 	if (!this->isDetourCreated) {
-		Log::Error() << "TrampolineHook::Deactivate(): Detour is not active ..." << Log::Endl;
+		Log::Error() << "TrampolineHook::Deactivate(): Hook is not active ..." << Log::Endl;
 		return false;
 	}
 
@@ -45,12 +45,12 @@ bool TrampolineHook::Deactivate() {
 	return this->ResetDetour();
 }
 
-uintptr_t TrampolineHook::GetGateway() {
+uintptr_t memory::TrampolineHook::GetGateway() {
 	return this->pGateway;
 }
 
 // deactivate detour and release allocated memory for the gateway
-void TrampolineHook::Destroy() {
+void memory::TrampolineHook::Destroy() {
 	if (!this->ResetDetour()) {
 		return;
 	}
@@ -61,7 +61,7 @@ void TrampolineHook::Destroy() {
 	Log::Info() << "TrampolineHook::Destroy(): Trampoline destroyed successfully ..." << Log::Endl;
 }
 
-void TrampolineHook::Create() {
+void memory::TrampolineHook::Create() {
 	if (!this->CheckParameterValid()) {
 		return;
 	}
@@ -71,7 +71,7 @@ void TrampolineHook::Create() {
 	}
 }
 
-bool TrampolineHook::CheckParameterValid() {
+bool memory::TrampolineHook::CheckParameterValid() {
 	if (!this->pSource || !this->pDestination) {
 		Log::Error() << "TrampolineHook::CheckParameterValid(): \"pSource\" or \"pDestination\" not set ..." << Log::Endl;
 		return false;
@@ -88,7 +88,7 @@ bool TrampolineHook::CheckParameterValid() {
 
 // creates the gateway. it allocates a memory page, copies the stolen bytes
 // and creates a detour towards the destination function. 
-bool TrampolineHook::CreateGateway() {
+bool memory::TrampolineHook::CreateGateway() {
 	// allocate memory for the gateway
 	this->pGateway = (uintptr_t)VirtualAlloc(0, this->dwLen, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
 
@@ -110,8 +110,8 @@ bool TrampolineHook::CreateGateway() {
 	}
 
 	// create the detour towards the original hooked function
-	if (!hook::Detour(this->pGateway, this->pSource, this->dwLen, this->dwLen)) {
-		Log::Error() << "TrampolineHook::CreateGateway(): Detour from gateway to source failed ..." << Log::Endl;
+	if (!memory::Hook(this->pGateway, this->pSource, this->dwLen, this->dwLen)) {
+		Log::Error() << "TrampolineHook::CreateGateway(): Hook from gateway to source failed ..." << Log::Endl;
 		return false;
 	}
 	
@@ -120,9 +120,9 @@ bool TrampolineHook::CreateGateway() {
 }
 
 // creates a detour from the hooked (source) function to our own (destination) function.
-bool TrampolineHook::CreateDetour() {
-	if (!hook::Detour(this->pSource, this->pDestination, this->dwLen)) {
-		Log::Error() << "TrampolineHook::CreateDetour(): Detour from source to destination failed ..." << Log::Endl;
+bool memory::TrampolineHook::CreateDetour() {
+	if (!memory::Hook(this->pSource, this->pDestination, this->dwLen)) {
+		Log::Error() << "TrampolineHook::CreateDetour(): Hook from source to destination failed ..." << Log::Endl;
 		return false;
 	}
 
@@ -131,7 +131,7 @@ bool TrampolineHook::CreateDetour() {
 }
 
 // release the memory allocation for the gateway
-bool TrampolineHook::ReleaseGateway() {
+bool memory::TrampolineHook::ReleaseGateway() {
 	if (!this->pGateway) {
 		Log::Info() << "TrampolineHook::ReleaseGateway(): No gateway available ..." << Log::Endl;
 		return true;
@@ -145,7 +145,7 @@ bool TrampolineHook::ReleaseGateway() {
 }
 
 // patch the stolen bytes back to the destination function.
-bool TrampolineHook::ResetDetour() {
+bool memory::TrampolineHook::ResetDetour() {
 	if (!this->isDetourCreated) {
 		Log::Info() << "TrampolineHook::ResetDetour(): No detour available ..." << Log::Endl;
 		return true;

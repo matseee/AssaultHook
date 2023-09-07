@@ -30,7 +30,7 @@ void Health::Activate() {
 	if (this->IsActive()) {
 		return;
 	}
-	if (!hook::Detour((uintptr_t)ADDR_DECREASE_HEALTH_INSTRUCTION, (uintptr_t)HealthHook, 5, 0)) {
+	if (!memory::Hook((uintptr_t)ADDR_DECREASE_HEALTH_INSTRUCTION, (uintptr_t)HealthHook, 5, 0)) {
 		return;
 	}
 	Hack::Activate();

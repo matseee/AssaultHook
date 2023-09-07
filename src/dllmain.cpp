@@ -19,7 +19,7 @@ const char titleAssaultHook[] = " >> AssaultHook <<";
 
 AcState* acState = nullptr;
 Menu* menu = nullptr;
-TrampolineHook* trampolineHook = nullptr;
+memory::TrampolineHook* trampolineHook = nullptr;
 
 // Typedefinition of the opengl32.ddl wglSwapBuffers function
 typedef BOOL(__stdcall* twglSwapBuffers) (HDC hDc);
@@ -96,7 +96,7 @@ DWORD __stdcall Thread(HMODULE hModule) {
 		}
 	});
 
-	trampolineHook = new TrampolineHook("opengl32.dll", "wglSwapBuffers", (uintptr_t)HookedWglSwapBuffers, 5);
+	trampolineHook = new memory::TrampolineHook("opengl32.dll", "wglSwapBuffers", (uintptr_t)HookedWglSwapBuffers, 5);
 
 	if (!trampolineHook->Activate()) {
 		Log::Error() << "DllMain::Thread(): Initialization failed ..." << Log::Endl;
