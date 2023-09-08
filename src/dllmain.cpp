@@ -75,18 +75,18 @@ DWORD __stdcall Thread(HMODULE hModule) {
 		MenuEntry{ "Unl. Health", new Health() },
 		MenuEntry{ "Unl. Ammo",
 			new Patch(
-				(uintptr_t)(acState->ModuleBase + ADDR_DECREASE_AMMO_FUNCTION),
-				(uintptr_t)"\x90\x90", // ac_client.exe+C73EF - 90 90    - nop
-				(uintptr_t)"\xFF\x08", // ac_client.exe+C73EF - FF 08    - dec[eax]
+				(addr)(acState->ModuleBase + ADDR_DECREASE_AMMO_FUNCTION),
+				(addr)"\x90\x90", // ac_client.exe+C73EF - 90 90    - nop
+				(addr)"\xFF\x08", // ac_client.exe+C73EF - FF 08    - dec[eax]
 				2
 			),
 		},
 		MenuEntry{ "No Recoil",
 			// instead of running the original calculateRecoil function, return directly
 			new Patch(
-				(uintptr_t)(acState->ModuleBase + ADDR_NORECOIL_FUNCTION),
-				(uintptr_t)"\xC2\x08\x00", // ac_client.exe+C8BA0 - C2 08 00    - ret 0008 { 8 }
-				(uintptr_t)"\x83\xEC\x28", // ac_client.exe+C8BA0 - 83 EC 28    - sub esp,28
+				(addr)(acState->ModuleBase + ADDR_NORECOIL_FUNCTION),
+				(addr)"\xC2\x08\x00", // ac_client.exe+C8BA0 - C2 08 00    - ret 0008 { 8 }
+				(addr)"\x83\xEC\x28", // ac_client.exe+C8BA0 - 83 EC 28    - sub esp,28
 				3
 			)
 		},
@@ -96,7 +96,7 @@ DWORD __stdcall Thread(HMODULE hModule) {
 		}
 	});
 
-	trampolineHook = new memory::TrampolineHook("opengl32.dll", "wglSwapBuffers", (uintptr_t)HookedWglSwapBuffers, 5);
+	trampolineHook = new memory::TrampolineHook("opengl32.dll", "wglSwapBuffers", (addr)HookedWglSwapBuffers, 5);
 
 	if (!trampolineHook->Activate()) {
 		Log::Error() << "DllMain::Thread(): Initialization failed ..." << Log::Endl;

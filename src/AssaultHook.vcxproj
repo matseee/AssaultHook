@@ -146,6 +146,7 @@
     <ClInclude Include="ac\acState.h" />
     <ClInclude Include="ac\acStructs.h" />
     <ClInclude Include="hacks\health.h" />
+    <ClInclude Include="memory\defines.h" />
     <ClInclude Include="memory\hook.h" />
     <ClInclude Include="memory\signature_scanner.h" />
     <ClInclude Include="opengl\opengl.h" />
@@ -159,6 +160,7 @@
     <ClInclude Include="menu\menu.h" />
     <ClInclude Include="opengl\draw.h" />
     <ClInclude Include="opengl\text.h" />
+    <ClInclude Include="utils\hex.h" />
     <ClInclude Include="utils\log.h" />
   </ItemGroup>
   <ItemGroup>
@@ -168,7 +170,6 @@
     <ClCompile Include="geometry\geometry.cpp" />
     <ClCompile Include="hacks\aimbot.cpp" />
     <ClCompile Include="hacks\esp.cpp" />
-    <ClCompile Include="hacks\hack.cpp" />
     <ClCompile Include="hacks\health.cpp" />
     <ClCompile Include="hacks\memhack.cpp" />
     <ClCompile Include="memory\hook.cpp" />

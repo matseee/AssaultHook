@@ -1,23 +1,22 @@
 #include "aimbot.h"
 
 void Aimbot::Tick() {
-	if (!this->IsActiveAndReady() || !(GetAsyncKeyState(VK_RBUTTON) & 0x8000)) {
+	if (!IsActiveAndReady() || !(GetAsyncKeyState(VK_RBUTTON) & 0x8000)) {
 		return;
 	}
 
-	AcEntity* entity = this->GetBestEntity();
+	AcEntity* entity = GetBestEntity();
 	if (!entity) {
-		Log::Debug() << "Aimbot::GetBestEntity(): No entity found!" << Log::Endl;
 		return;
 	}
 
-	this->AimToEntity(entity);
+	AimToEntity(entity);
 }
 
 AcEntity* Aimbot::GetBestEntity() {
-	if (!this->m_AcState->EntityList || !this->m_AcState->EntityList->Entities) {
+	if (!m_AcState->EntityList || !m_AcState->EntityList->Entities) {
 		Log::Warning() << "Aimbot::GetBestEntity(): \"m_AcState->EntityList\" not available ..." << Log::Endl;
-		this->m_AcState->UpdateAttributes();
+		m_AcState->UpdateAttributes();
 		return nullptr;
 	}
 
@@ -27,17 +26,17 @@ AcEntity* Aimbot::GetBestEntity() {
 	float bestDistance = 0;
 	float distance = 0;
 
-	for (int i = 0; i < *this->m_AcState->PlayerCount; i++) {
-		if (!this->m_AcState->IsValidEntity(this->m_AcState->EntityList->Entities[i])) {
+	for (int i = 0; i < *m_AcState->PlayerCount; i++) {
+		if (!m_AcState->IsValidEntity(m_AcState->EntityList->Entities[i])) {
 			continue;
 		}
 
-		entity = this->m_AcState->EntityList->Entities[i];
-		if (!this->m_AcState->IsEnemy(entity) || !this->IsVisible(entity)) {
+		entity = m_AcState->EntityList->Entities[i];
+		if (!m_AcState->IsEnemy(entity) || !IsVisible(entity)) {
 			continue;
 		}
 
-		distance = this->m_AcState->LocalPlayer->Origin.Distance(entity->Origin);
+		distance = m_AcState->LocalPlayer->Origin.Distance(entity->Origin);
 		if (distance < bestDistance || bestDistance == 0) {
 			bestDistance = distance;
 			bestEntity = entity;
@@ -47,7 +46,7 @@ AcEntity* Aimbot::GetBestEntity() {
 }
 
 bool Aimbot::IsVisible(AcEntity* entity) {
-	AcEntity* localPlayer = this->m_AcState->LocalPlayer;
+	AcEntity* localPlayer = m_AcState->LocalPlayer;
 	geometry::Vector3 tmpTo = entity->Head.x >= 0 ? entity->Head : entity->Origin;
 	vec from = vec(localPlayer->Origin.x, localPlayer->Origin.y, localPlayer->Origin.z);
 	vec to = vec(tmpTo.x, tmpTo.y, tmpTo.z);
@@ -57,15 +56,15 @@ bool Aimbot::IsVisible(AcEntity* entity) {
 }
 
 void Aimbot::AimToEntity(AcEntity* entity) {
-	geometry::Vector3 angle = this->CalcAngle(entity);
-	this->m_AcState->LocalPlayer->Angle.x = angle.x;
-	this->m_AcState->LocalPlayer->Angle.y = angle.y;
+	geometry::Vector3 angle = CalcAngle(entity);
+	m_AcState->LocalPlayer->Angle.x = angle.x;
+	m_AcState->LocalPlayer->Angle.y = angle.y;
 }
 
 geometry::Vector3 Aimbot::CalcAngle(AcEntity* entity) {
 	geometry::Vector3 v = entity->Head.x >= 0 ? entity->Head : entity->Origin;
 
-	v = this->m_AcState->LocalPlayer->Origin - v;
+	v = m_AcState->LocalPlayer->Origin - v;
 
 	geometry::Vector3 angles;
 	angles.x = ::atanf(v.x / v.y) * -57.2957795f;

@@ -1,7 +1,7 @@
 #include "memhack.h"
 
-Patch::Patch(uintptr_t address, uintptr_t valueOn,
-	uintptr_t valueOff, unsigned long size) : Hack() {
+Patch::Patch(addr address, addr valueOn,
+	addr valueOff, unsigned long size) : Hack() {
 	this->m_Address = address;
 	this->m_ValueOn = valueOn;
 	this->m_ValueOff = valueOff;
@@ -28,5 +28,5 @@ void Patch::Deactivate() {
 }
 
 void Patch::MemPatch() {
-	memory::PatchBytes((BYTE*)this->m_Address, (BYTE*)(this->IsActive() ? this->m_ValueOn : this->m_ValueOff), this->m_Size);
+	memory::PatchBytes((addr*)this->m_Address, (addr*)(this->IsActive() ? this->m_ValueOn : this->m_ValueOff), this->m_Size);
 }

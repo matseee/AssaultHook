@@ -2,9 +2,17 @@
 #include <windows.h>
 #include <vector>
 
+#include "../utils/log.h"
+
+#include "defines.h"
+
 namespace memory {
-	bool PatchBytes(BYTE* destination, BYTE* source, unsigned int size);
-	void ReadBytes(BYTE* source, BYTE* destination, unsigned int size);
-	void NopBytes(BYTE* destination, unsigned int size);
-	uintptr_t FindDMAAddress(uintptr_t ptr, std::vector<unsigned int> offsets);
-}
+	addr AllocateMemory(addr source, uint size);
+	bool FreeMemory(addr source);
+
+	bool PatchBytes(addr* destination, addr* source, uint size);
+	bool ReadBytes(addr* source, addr* destination, uint size);
+	bool NopBytes(addr* destination, uint size);
+	
+	addr FindDMAAddress(addr baseAddress, std::vector<uint> offsets);
+};

@@ -1,5 +1,9 @@
 #include "health.h"
 
+// Original instructions of DoDamage()
+// .text:0041C223 sub[ebx + 4], esi		- 29 73 04 
+// .text:0041C226 mov     eax, esi		- 8B C6
+
 DWORD LocalPlayerState;
 DWORD JmpBackHealthHook = ADDR_DECREASE_HEALTH_INSTRUCTION + 5;
 
@@ -16,10 +20,7 @@ void _declspec(naked) HealthHook() {
 }
 
 Health::Health() : Hack() {
-	// copy "stolen bytes", so that we can restore the original code execution
-	// .text:0041C223 sub[ebx + 4], esi		- 29 73 04 
-	// .text:0041C226 mov     eax, esi		- 8B C6
-	memory::ReadBytes((BYTE*)ADDR_DECREASE_HEALTH_INSTRUCTION, this->m_StolenBytes, 5);
+	m_DoDamageHook = new memory::Hook(ADDR_DECREASE_HEALTH_INSTRUCTION, (addr)HealthHook, 5);
 }
 
 Health::~Health() {
@@ -30,25 +31,19 @@ void Health::Activate() {
 	if (this->IsActive()) {
 		return;
 	}
-	if (!memory::Hook((uintptr_t)ADDR_DECREASE_HEALTH_INSTRUCTION, (uintptr_t)HealthHook, 5, 0)) {
-		return;
-	}
-	Hack::Activate();
+	m_IsActive = m_DoDamageHook->Activate();
 }
 
 void Health::Deactivate() {
 	if (!this->IsActive()) {
 		return;
 	}
-	if (!memory::PatchBytes((BYTE*)ADDR_DECREASE_HEALTH_INSTRUCTION, (BYTE*)this->m_StolenBytes, 5)) {
-		return;
-	}
-	Hack::Deactivate();
+	m_IsActive = !m_DoDamageHook->Deactivate();
 }
 
 void Health::Tick() {
 	if (!this->m_AcState->IsReady()) {
 		return;
 	}
-	LocalPlayerState = ((DWORD)&this->m_AcState->LocalPlayer->Health) - 4;
+	LocalPlayerState = ((ulong)&this->m_AcState->LocalPlayer->Health) - 4;
 }

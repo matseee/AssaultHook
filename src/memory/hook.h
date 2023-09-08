@@ -1,16 +1,30 @@
 #pragma once
 #include <Windows.h>
-
-#define ASM_INSTRUCTION_NOP 0x90
-
-#ifdef _WIN64
-#define DETOUR_MIN_LENGTH		16
-#define ASM_INSTRUCTION_JMP		0x08EB0000000215FF
-#else
-#define DETOUR_MIN_LENGTH		5
-#define ASM_INSTRUCTION_JMP		0xE9
-#endif
+#include "defines.h"
+#include "memory.h"
 
 namespace memory {
-	bool Hook(uintptr_t pSource, uintptr_t pDestination, uintptr_t pLength, uintptr_t pSourcePadding = 0);
-}
+	class Hook {
+	public:
+		Hook(addr sourceAddress, addr destinationAddress, uint length);
+		Hook(addr sourceAddress, addr destinationAddress, uint length, uint sourcePadding);
+		~Hook();
+
+		bool Activate();
+		bool Deactivate();
+		bool IsActive();
+
+	protected:
+		bool CheckAllowed();
+		bool Create();
+		bool Destroy();
+
+		addr m_SourceAddress;
+		addr m_DestinationAddress;
+		uint m_Length;
+		uint m_SourcePadding;
+
+		bool m_IsActive;
+		byte m_StolenBytes[20];
+	};
+};

@@ -12,5 +12,5 @@ public:
 	void Tick();
 
 protected:
-	BYTE m_StolenBytes[5];
+	memory::Hook* m_DoDamageHook;
 };

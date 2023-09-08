@@ -1,4 +1,5 @@
 #pragma once
+#include "defines.h"
 #include "memory.h"
 #include "hook.h"
 #include "../utils/log.h"
@@ -6,36 +7,32 @@
 namespace memory {
 	class TrampolineHook {
 	public:
-		TrampolineHook(const char* cModuleName, const char* cProcName, uintptr_t pDestination, uintptr_t dwLen);
-		TrampolineHook(HMODULE hModule, const char* cProcName, uintptr_t pDestination, uintptr_t dwLen);
-		TrampolineHook(uintptr_t pSource, uintptr_t pDestination, uintptr_t dwLen);
+		TrampolineHook(const char* moduleName, const char* processName, addr destinationAddress, uint length);
+		TrampolineHook(HMODULE module, const char* processName, addr destinationAddress, uint length);
+		TrampolineHook(addr sourceAddress, addr destinationAddress, uint length);
 		~TrampolineHook();
 
 		bool Activate();
 		bool Deactivate();
 		void Destroy();
 
-		uintptr_t GetGateway();
+		addr GetGateway();
 
 	protected:
-		uintptr_t pSource;
-		uintptr_t pDestination;
+		bool CheckAllowed();
+		bool CreateGatewayWithHook();
+		bool CreateSourceHook();
 
-		uintptr_t dwLen;
-		uintptr_t pGateway;
+		bool DestroyGateway();
+		bool DeactivateSourceHook();
 
-		BYTE stolenBytes[DETOUR_MIN_LENGTH * 2];
+		addr m_SourceAddress;
+		addr m_DestinationAddress;
+		uint m_Length;
 
-		bool isGatewayCreated = false;
-		bool isDetourCreated = false;
+		addr m_GatewayAddress;
+		memory::Hook* m_GatewayHook;
 
-		void Create();
-
-		bool CheckParameterValid();
-		bool CreateGateway();
-		bool CreateDetour();
-
-		bool ReleaseGateway();
-		bool ResetDetour();
+		memory::Hook* m_SourceHook;
 	};
 };

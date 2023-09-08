@@ -14,13 +14,13 @@ class ESPBase : public Hack {
 public:
 	void Tick();
 protected:
-	Viewport m_Viewport;
-	
 	void LoopOverEntities();
 	virtual void Render(AcEntity* entity, geometry::Vector2 screenCoordinates) {};
 
 	const GLubyte* GetEntityColor(AcEntity* entity);
 	float GetDistanceTo(AcEntity* entity);
+
+	Viewport m_Viewport;
 };
 
 class ESPBox : public ESPBase {
@@ -36,8 +36,8 @@ protected:
 
 class ESPName : public ESPBox {
 protected:
-	opengl::Text::Font m_Font;
 	void Render(AcEntity* entity, geometry::Vector2 screenCoordinates);
+	opengl::Text::Font m_Font;
 };
 
 class ESPLine : public ESPBase {

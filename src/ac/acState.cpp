@@ -17,38 +17,38 @@ void AcState::Destroy() {
 }
 
 AcState::AcState() {
-    this->Setup();
+    Setup();
 }
 
 AcState::~AcState() {
-    this->Matrix = nullptr;
-    this->GameMode = nullptr;
-    this->LocalPlayer = nullptr;
-    this->EntityList = nullptr;
-    this->PlayerCount = nullptr;
+    Matrix = nullptr;
+    GameMode = nullptr;
+    LocalPlayer = nullptr;
+    EntityList = nullptr;
+    PlayerCount = nullptr;
 
-    this->ModuleBase = NULL;
+    ModuleBase = NULL;
 }
 
 bool AcState::IsReady() {
-    if (!this->CheckReady()) {
-        this->Setup();
+    if (!CheckReady()) {
+        Setup();
     }
-    return this->CheckReady();
+    return CheckReady();
 }
 
 void AcState::Setup() {
-    this->LoadModules();
-    this->UpdateAttributes();
+    LoadModules();
+    UpdateAttributes();
     Log::Debug() << "AcState::Setup(): Done ..." << Log::Endl;
 }
 
 bool AcState::CheckReady() {
-    return this->ModuleBase;
+    return ModuleBase;
 }
 
 bool AcState::IsTeamGame() {
-	int* gameMode = this->GameMode;
+	int* gameMode = GameMode;
 	return *gameMode == 0 || *gameMode == 4 
 		|| *gameMode == 5 || *gameMode == 7 
 		|| *gameMode == 11 || *gameMode == 13 
@@ -58,7 +58,7 @@ bool AcState::IsTeamGame() {
 }
 
 bool AcState::IsEnemy(AcEntity* entity) {
-	return !this->IsTeamGame() || entity->Team != this->LocalPlayer->Team;
+	return !IsTeamGame() || entity->Team != LocalPlayer->Team;
 }
 
 bool AcState::IsValidEntity(AcEntity* entity) {
@@ -67,23 +67,23 @@ bool AcState::IsValidEntity(AcEntity* entity) {
 }
 
 void AcState::LoadModules() {
-    this->ModuleBase = (uintptr_t)GetModuleHandle(L"ac_client.exe");
-    if (!this->ModuleBase) {
+    ModuleBase = (addr)GetModuleHandle(L"ac_client.exe");
+    if (!ModuleBase) {
         Log::Error() << "AcState::LoadModules(): Could not get \"ac_client.exe\" module handle ..." << Log::Endl;
     }
-    Log::Debug() << "AcState::LoadModules(): GetModuleHandle(\"ac_client.exe\") => " << (void*)this->ModuleBase << Log::Endl;
+    Log::Debug() << "AcState::LoadModules(): GetModuleHandle(\"ac_client.exe\") => 0x" << (void*)ModuleBase << Log::Endl;
 }
 
 void AcState::UpdateAttributes() {
-    if (!this->CheckReady()) {
+    if (!CheckReady()) {
         Log::Warning() << "AcState::UpdateAttributes(): Not ready! Returned without updating attributes ..." << Log::Endl;
         return;
     }
-    this->Matrix = (float*)(ADDR_MATRIX);
-    this->GameMode = (int*)(this->ModuleBase + ADDR_GAME_MODE);
-    this->LocalPlayer = *((AcEntity**)(this->ModuleBase + ADDR_ENTITY_LOCALPLAYER));
-    this->EntityList = *((AcEntityList**)(this->ModuleBase + ADDR_ENTITY_LIST));
-    this->PlayerCount = (int*)(this->ModuleBase + ADDR_NUM_PLAYERS);
+    Matrix = (float*)(ADDR_MATRIX);
+    GameMode = (int*)(ModuleBase + ADDR_GAME_MODE);
+    LocalPlayer = *((AcEntity**)(ModuleBase + ADDR_ENTITY_LOCALPLAYER));
+    EntityList = *((AcEntityList**)(ModuleBase + ADDR_ENTITY_LIST));
+    PlayerCount = (int*)(ModuleBase + ADDR_NUM_PLAYERS);
 
     Log::Debug() << "AcState::UpdateAttributes(): Done ..." << Log::Endl;
 }

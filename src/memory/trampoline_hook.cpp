@@ -1,32 +1,36 @@
 #include "trampoline_hook.h"
 
-memory::TrampolineHook::TrampolineHook(const char* cModuleName, const char* cProcName, uintptr_t pDestination, uintptr_t dwLen) 
-	: TrampolineHook(GetModuleHandleA(cModuleName), cProcName, pDestination, dwLen) { }
+memory::TrampolineHook::TrampolineHook(const char* moduleName, const char* procName, addr destinationAddress, uint length) 
+	                  : TrampolineHook(GetModuleHandleA(moduleName), procName, destinationAddress, length) { }
 
-memory::TrampolineHook::TrampolineHook(HMODULE hModule, const char* cProcName, uintptr_t pDestination, uintptr_t dwLen) 
-	: TrampolineHook((uintptr_t)GetProcAddress(hModule, cProcName), pDestination, dwLen) { }
+memory::TrampolineHook::TrampolineHook(HMODULE module, const char* procName, addr destinationAddress, uint length) 
+					  : TrampolineHook((addr)GetProcAddress(module, procName), destinationAddress, length) { }
 
-memory::TrampolineHook::TrampolineHook(uintptr_t pSource, uintptr_t pDestination, uintptr_t dwLen) {
-	this->pSource = pSource;
-	this->pDestination = pDestination;
-	this->dwLen = dwLen;
-	this->pGateway = NULL;
+memory::TrampolineHook::TrampolineHook(addr sourceAddress, addr destinationAddress, uint length) {
+	m_SourceAddress = sourceAddress;
+	m_DestinationAddress = destinationAddress;
+	m_Length = length;
+	m_GatewayAddress = NULL;
 
-	this->Create();
+	if (!CheckAllowed()) {
+		return;
+	}
+	if (!CreateGatewayWithHook()) {
+		return;
+	}
 }
 
 memory::TrampolineHook::~TrampolineHook() {
-	this->Destroy();
+	Destroy();
 }
 
-// creates the detour (source -> destination) when a gateway is available
 bool memory::TrampolineHook::Activate() {
-	if (!this->isGatewayCreated || !this->pGateway) {
+	if (!m_GatewayHook || !m_GatewayHook->IsActive()) {
 		Log::Error() << "TrampolineHook::Activate(): Gateway is not created ..." << Log::Endl;
 		return false;
 	}
 
-	if (!this->CreateDetour()) {
+	if (!CreateSourceHook()) {
 		return false;
 	}
 
@@ -34,124 +38,106 @@ bool memory::TrampolineHook::Activate() {
 	return true;
 }
 
-// only deactivate the detour (source -> destination)
 bool memory::TrampolineHook::Deactivate() {
-	if (!this->isDetourCreated) {
+	if (!m_SourceHook || !m_SourceHook->IsActive()) {
 		Log::Error() << "TrampolineHook::Deactivate(): Hook is not active ..." << Log::Endl;
 		return false;
 	}
 
 	Log::Info() << "TrampolineHook::Deactivate(): Deactivation of TrampolineHook successful ..." << Log::Endl;
-	return this->ResetDetour();
+	return DeactivateSourceHook();
 }
 
-uintptr_t memory::TrampolineHook::GetGateway() {
-	return this->pGateway;
+addr memory::TrampolineHook::GetGateway() {
+	return m_GatewayAddress;
 }
 
-// deactivate detour and release allocated memory for the gateway
 void memory::TrampolineHook::Destroy() {
-	if (!this->ResetDetour()) {
+	if (!DeactivateSourceHook()) {
 		return;
 	}
-
-	if (!this->ReleaseGateway()) {
+	if (!DestroyGateway()) {
 		return;
 	}
 	Log::Info() << "TrampolineHook::Destroy(): Trampoline destroyed successfully ..." << Log::Endl;
 }
 
-void memory::TrampolineHook::Create() {
-	if (!this->CheckParameterValid()) {
-		return;
-	}
-
-	if (!this->CreateGateway()) {
-		return;
-	}
-}
-
-bool memory::TrampolineHook::CheckParameterValid() {
-	if (!this->pSource || !this->pDestination) {
-		Log::Error() << "TrampolineHook::CheckParameterValid(): \"pSource\" or \"pDestination\" not set ..." << Log::Endl;
+bool memory::TrampolineHook::CheckAllowed() {
+	if (!m_SourceAddress || !m_DestinationAddress) {
+		Log::Error() << "TrampolineHook::CheckAllowed(): \"m_SourceAddress\" or \"m_DestinationAddress\" not set ..." << Log::Endl;
 		return false;
 	}
-
-	// check length for relative jmp instruction
-	if (this->dwLen < DETOUR_MIN_LENGTH) {
-		Log::Error() << "TrampolineHook::CheckParameterValid(): \"dwLen\" is smaller than " << DETOUR_MIN_LENGTH << " ..." << Log::Endl;
+	if (m_Length < MEMORY_HOOK_MINLENGTH) {
+		Log::Error() << "TrampolineHook::CheckAllowed(): \"m_Length\" is smaller than " << MEMORY_HOOK_MINLENGTH << " ..." << Log::Endl;
 		return false;
 	}
-
 	return true;
 }
 
-// creates the gateway. it allocates a memory page, copies the stolen bytes
-// and creates a detour towards the destination function. 
-bool memory::TrampolineHook::CreateGateway() {
-	// allocate memory for the gateway
-	this->pGateway = (uintptr_t)VirtualAlloc(0, this->dwLen, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
-
-	if (!this->pGateway) {
-		Log::Error() << "TrampolineHook::CreateGateway(): VirtualAlloc() failed ..." << Log::Endl;
-		return false;
-	}
-
-	// backup the stolen bytes
-	if (memcpy_s(this->stolenBytes, this->dwLen, (uintptr_t*)this->pSource, this->dwLen) != 0) {
-		Log::Error() << "TrampolineHook::CreateGateway(): Backup of the stolen bytes failed ..." << Log::Endl;
-		return false;
-	}
-
-	// write the stolen bytes to the previously allocated memory
-	if (memcpy_s((uintptr_t*)this->pGateway, this->dwLen, (uintptr_t*)this->pSource, this->dwLen) != 0) {
-		Log::Error() << "TrampolineHook::CreateGateway(): Writing stolen bytes to gateway failed ..." << Log::Endl;
-		return false;
-	}
-
-	// create the detour towards the original hooked function
-	if (!memory::Hook(this->pGateway, this->pSource, this->dwLen, this->dwLen)) {
-		Log::Error() << "TrampolineHook::CreateGateway(): Hook from gateway to source failed ..." << Log::Endl;
+bool memory::TrampolineHook::CreateGatewayWithHook() {
+	// allocate memory for gateway
+	m_GatewayAddress = memory::AllocateMemory(0, m_Length);
+	if (!m_GatewayAddress) {
+		Log::Error() << "TrampolineHook::CreateGatewayWithHook(): AllocateMemory() failed ..." << Log::Endl;
 		return false;
 	}
 	
-	Log::Debug() << "TrampolineHook::CreateGateway(): \"" << (void*)this->pGateway << "\" => \"" << (void*)this->pSource << "\" successful ..." << Log::Endl;
-	return this->isGatewayCreated = true;
-}
-
-// creates a detour from the hooked (source) function to our own (destination) function.
-bool memory::TrampolineHook::CreateDetour() {
-	if (!memory::Hook(this->pSource, this->pDestination, this->dwLen)) {
-		Log::Error() << "TrampolineHook::CreateDetour(): Hook from source to destination failed ..." << Log::Endl;
+	// write the stolen bytes to the previously allocated memory
+	if (!memory::PatchBytes((addr*)m_GatewayAddress, (addr*)m_SourceAddress, m_Length)) {
+		Log::Error() << "TrampolineHook::CreateGatewayWithHook(): Writing stolen bytes to gateway failed ..." << Log::Endl;
 		return false;
 	}
 
-	Log::Debug() << "TrampolineHook::CreateDetour(): \"" << (void*)this->pSource << "\" => \"" << (void*)this->pDestination << "\" successful ..." << Log::Endl;
-	return this->isDetourCreated = true;
-}
+	// create a hook from the gateway to the hooked (source) function
+	m_GatewayHook = new memory::Hook(m_GatewayAddress, m_SourceAddress, m_Length, m_Length);
 
-// release the memory allocation for the gateway
-bool memory::TrampolineHook::ReleaseGateway() {
-	if (!this->pGateway) {
-		Log::Info() << "TrampolineHook::ReleaseGateway(): No gateway available ..." << Log::Endl;
-		return true;
-	}
-
-	if (VirtualFree((uintptr_t*)this->pGateway, 0, MEM_RELEASE) != 0) {
-		Log::Error() << "TrampolineHook::ReleaseGateway(): VirtualFree() of gateway \"" << (void*)this->pGateway << "\" failed ..." << Log::Endl;
+	if (!m_GatewayHook->Activate()) {
+		Log::Error() << "TrampolineHook::CreateGatewayWithHook(): Creation of hook from gateway to source failed ..." << Log::Endl;
 		return false;
 	}
+	
+	Log::Debug() << "TrampolineHook::CreateGatewayWithHook(): 0x" << (void*)m_GatewayAddress << " => 0x" << (void*)m_SourceAddress << " successful ..." << Log::Endl;
 	return true;
 }
 
-// patch the stolen bytes back to the destination function.
-bool memory::TrampolineHook::ResetDetour() {
-	if (!this->isDetourCreated) {
-		Log::Info() << "TrampolineHook::ResetDetour(): No detour available ..." << Log::Endl;
+bool memory::TrampolineHook::CreateSourceHook() {
+	// creates a hook from the source function to our own destination function.
+	m_SourceHook = new memory::Hook(m_SourceAddress, m_DestinationAddress, m_Length);
+
+	if (!m_SourceHook->Activate()) {
+		Log::Error() << "TrampolineHook::CreateSourceHook(): 0x" << (void*)m_SourceAddress << " => 0x" << (void*)m_DestinationAddress << " failed ..." << Log::Endl;
+		return false;
+	}
+
+	Log::Debug() << "TrampolineHook::CreateSourceHook(): 0x" << (void*)m_SourceAddress << " => 0x" << (void*)m_DestinationAddress << " successful ..." << Log::Endl;
+	return true;
+}
+
+bool memory::TrampolineHook::DeactivateSourceHook() {
+	// by patching the stolen bytes back to the destination function.
+	if (!m_SourceHook || !m_SourceHook->IsActive()) {
+		Log::Warning() << "TrampolineHook::DeactivateSourceHook(): No hook active ..." << Log::Endl;
 		return true;
 	}
 
-	memory::PatchBytes((BYTE*)this->pSource, (BYTE*)this->stolenBytes, this->dwLen);
-	this->isDetourCreated = false;
+	if (!m_SourceHook->Deactivate()) {
+		Log::Error() << "TrampolineHook::DeactivateSourceHook(): Restoring \"stolen bytes\" failed ..." << Log::Endl;
+		return false;
+	}
+	
+	return true;
+}
+
+bool memory::TrampolineHook::DestroyGateway() {
+	// by releasing the allocated memory for the gateway
+	if (!m_GatewayAddress) {
+		Log::Warning() << "TrampolineHook::DestroyGateway(): No gateway available ..." << Log::Endl;
+		return true;
+	}
+
+	if (!memory::FreeMemory(m_GatewayAddress)) {
+		Log::Error() << "TrampolineHook::DestroyGateway(): FreeMemory of 0x" << (void*)m_GatewayAddress << " failed ..." << Log::Endl;
+		return false;
+	}
 	return true;
 }

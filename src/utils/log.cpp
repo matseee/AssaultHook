@@ -16,6 +16,13 @@ std::ostream& Log::Print(LogLevel level) {
 	return Log::NullStream;
 }
 
+void Log::Bytes(byte* bytes, unsigned int length) {
+	for (unsigned int i = 0; i < length; i++) {
+		std::cout << hex(bytes[i]) << " ";
+	}
+	std::cout << " ..." << std::endl;
+};
+
 std::ostream& Log::Endl(std::ostream& ostream) { 
 	return std::endl(ostream);
 }

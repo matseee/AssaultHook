@@ -4,6 +4,7 @@
 #include "../utils/log.h"
 #include "acAddresses.h"
 #include "acStructs.h"
+#include "../memory/memory.h"
 
 class AcState
 {
@@ -18,7 +19,7 @@ public:
 	bool IsEnemy(AcEntity* entity);
 	bool IsValidEntity(AcEntity* entity);
 
-	uintptr_t ModuleBase = NULL;
+	addr ModuleBase = NULL;
 
 	int* GameMode = nullptr;
 	int* PlayerCount = nullptr;
@@ -27,13 +28,13 @@ public:
 	AcEntityList* EntityList = nullptr;
 
 protected:
-	static AcState* Instance;
-
 	AcState();
 	~AcState();
 
 	void Setup();
 	bool CheckReady();
 	void LoadModules();
+
+	static AcState* Instance;
 };
 

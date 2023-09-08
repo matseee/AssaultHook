@@ -1,40 +1,54 @@
 #include "memory.h"
 
-bool memory::PatchBytes(BYTE* destination, BYTE* source, unsigned int size) {
-	DWORD protection;
+addr memory::AllocateMemory(addr source, uint size) {
+	return (addr)VirtualAlloc((addr*)source, size, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE); 
+}
+
+bool memory::FreeMemory(addr source) {
+	return VirtualFree((addr*)source, 0, MEM_RELEASE) == 0;
+}
+
+bool memory::PatchBytes(addr* destination, addr* source, uint size) {
+	ulong protection;
 	if (!VirtualProtect(destination, size, PAGE_EXECUTE_READWRITE, &protection)) {
 		return false;
 	}
-	if (memcpy_s(destination, size, source, size) != 0) {
+	if (memcpy_s((addr*)destination, size, source, size) != 0) {
 		return false;
 	}
 	return VirtualProtect(destination, size, protection, &protection);
 }
 
-void memory::ReadBytes(BYTE* source, BYTE* destination, unsigned int size) {
-	DWORD protection;
-	VirtualProtect(source, size, PAGE_EXECUTE_READWRITE, &protection);
-	memcpy_s(destination, size, source, size);
-	VirtualProtect(source, size, protection, &protection);
+bool memory::ReadBytes(addr* source, addr* destination, uint size) {
+	ulong protection;
+	if (!VirtualProtect(source, size, PAGE_EXECUTE_READWRITE, &protection)) {
+		return false;
+	}
+	if (memcpy_s((addr*)destination, size, source, size) != 0) {
+		return false;
+	}
+	return VirtualProtect(source, size, protection, &protection);
 }
 
-void memory::NopBytes(BYTE* destination, unsigned int size) {
-	DWORD protection;
-	VirtualProtect(destination, size, PAGE_EXECUTE_READWRITE, &protection);
-	memset(destination, 0x90, size);
-	VirtualProtect(destination, size, protection, &protection);
+bool memory::NopBytes(addr* destination, uint size) {
+	ulong protection;
+	if (!VirtualProtect(destination, size, PAGE_EXECUTE_READWRITE, &protection)) {
+		return false;
+	}
+	memset(destination, MEMORY_ASM_INSTRUCTION_NOP, size);
+	return VirtualProtect(destination, size, protection, &protection) != 0;
 }
 
-uintptr_t memory::FindDMAAddress(uintptr_t ptr, std::vector<unsigned int> offsets) {
-	uintptr_t addr = ptr;
-	for (unsigned int i = 0; i < offsets.size(); ++i) {
-		addr = *(uintptr_t*)addr;
+addr memory::FindDMAAddress(addr baseAddress, std::vector<uint> offsets) {
+	addr address = baseAddress;
+	for (uint i = 0; i < offsets.size(); ++i) {
+		address = *(addr*)address;
 
-		if (!addr) {
-			return addr;
+		if (!address) {
+			return address;
 		}
 
-		addr += offsets[i];
+		address += offsets[i];
 	}
-	return addr;
+	return address;
 }

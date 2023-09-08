@@ -3,6 +3,8 @@
 #include <iostream>
 #include <fstream>
 
+#include "hex.h"
+
 enum LogLevel {
 	LOG_DEBUG,
 	LOG_INFO,
@@ -21,12 +23,12 @@ public:
 
 	static std::ostream& Endl(std::ostream& ostream);
 
+	static void Bytes(byte* bytes, unsigned int length); 
+
 	static void SetActive(bool active);
 	static void Destroy();
 
 protected:
-	static Log* Instance;
-
 	Log();
 	~Log();
 	
@@ -37,6 +39,8 @@ protected:
 
 	static std::string GetTimestamp();
 	static std::string LogLevelToString(LogLevel l);
+
+	static Log* Instance;
 
 	static bool IsActive;
 	static FILE* ConsoleStream;

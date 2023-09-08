@@ -30,19 +30,18 @@ public:
 	void Tick();
 
 protected:
-	opengl::Text::Font m_Font;
-	bool m_IsOpen;
-
-	std::vector<MenuEntry> m_Entries;
-	MenuEntry m_SelectedEntry;
-	int m_SelectedIndex;
-
 	void Input();
 	void Render();
 	void RenderMenu();
 	float CalculateMenuHeight();
 	void ForwardTick();
-	void Next(int skip = 0);
-	void Previous(int skip = 0);
+	void Next(int iSkip = 0);
+	void Previous(int iSkip = 0);
+
+	std::vector<MenuEntry> m_Entries;
+	MenuEntry m_SelectedEntry;
+	int m_SelectedIndex;
+	opengl::Text::Font m_Font;
+	bool m_IsOpen;
 };
 
