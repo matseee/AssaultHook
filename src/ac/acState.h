@@ -22,7 +22,12 @@ public:
 	bool IsValidEntity(AcEntity* entity);
 
 	addr ModuleBase = NULL;
+
 	addr NoRecoil = NULL;
+	addr DecreaseAmmo = NULL;
+	addr DecreaseHealth = NULL;
+	addr IntersectClosest = NULL;
+	addr IntersectGeometry = NULL;
 
 	int* GameMode = nullptr;
 	int* PlayerCount = nullptr;

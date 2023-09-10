@@ -15,7 +15,7 @@ namespace memory {
 		~SignatureScanner() {};
 
 		bool Scan(Signature* signature);
-		bool ScanMulti(Signature signature[]);
+		bool ScanMulti(Signature signatures[], uint signatureCount);
 
 	protected:
 		bool ScanMemory(addr from, addr to, Signature signature[], uint signatureCount);

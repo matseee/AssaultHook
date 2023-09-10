@@ -83,16 +83,34 @@ bool AcState::ScanForSignatures() {
         return false;
     }
 
-    memory::Signature sig{"\x83\xEC\x28\x53\x55\x8B\x6C","xxxxxxx",};
+    memory::Signature signatures[] = {
+		memory::Signature { "\x83\xEC\x28\x53\x55\x8B\x6C","xxxxxxx", },                                // sigNoRecoil
+		memory::Signature { "\xFF\x08\x8D\x44\x24\x1C", "xxxxxx", },                                    // sigDecreaseAmmo
+		memory::Signature { "\x29\x73\x04\x8B\xC6", "xxxxx", },                                         // sigDecreaseHealth
+		memory::Signature { "\x83\xEC\x1C\xA1\x00\xAC\x58\x00", "xxxxxxxx", },                          // sigIntersectClosest
+		memory::Signature { "\x55\x8B\xEC\x83\xE4\xF8\x81\xEC\x34\x01\x00\x00\x53", "xxxxxxxxxxxxx", }, // sigIntersectGeometry
+    };
+
 	memory::SignatureScanner* scanner = new memory::SignatureScanner(ModuleBase, moduleInfo.SizeOfImage);
-    
-    if (!scanner->Scan(&sig)) {
-        Log::Error() << "AcState::ScanForSignatures() : Could not find signature for NoRecoil function ..." << Log::Endl;
+    if (!scanner->ScanMulti(signatures, (sizeof(signatures) / sizeof(memory::Signature)))) {
+        Log::Error() << "AcState::ScanForSignatures() : Could not find all signatures ..." << Log::Endl;
         return false;
     }
 
-    Log::Info() << "AcState::ScanForSignatures(): Found NoRecoil signature at 0x" << (void*)sig.address << " ..." << Log::Endl;
-    NoRecoil = sig.address;
+    Log::Info() << "AcState::ScanForSignatures(): Found NoRecoil signature at 0x" << (void*)signatures[0].address << " ..." << Log::Endl;
+    NoRecoil = signatures[0].address;
+
+    Log::Info() << "AcState::ScanForSignatures(): Found DecreaseAmmo signature at 0x" << (void*)signatures[1].address << " ..." << Log::Endl;
+    DecreaseAmmo = signatures[1].address;
+
+    Log::Info() << "AcState::ScanForSignatures(): Found DecreaseHealth signature at 0x" << (void*)signatures[2].address << " ..." << Log::Endl;
+    DecreaseHealth = signatures[2].address;
+    
+    Log::Info() << "AcState::ScanForSignatures(): Found IntersectClosest signature at 0x" << (void*)signatures[3].address << " ..." << Log::Endl;
+    IntersectClosest = signatures[3].address;
+    
+    Log::Info() << "AcState::ScanForSignatures(): Found IntersectGeometry signature at 0x" << (void*)signatures[4].address << " ..." << Log::Endl;
+    IntersectGeometry = signatures[4].address;
     return true;
 }
 
@@ -102,11 +120,11 @@ void AcState::UpdateAttributes() {
         Log::Warning() << "AcState::UpdateAttributes(): Not ready! Returned without updating attributes ..." << Log::Endl;
         return;
     }
+
     Matrix = (float*)(ADDR_MATRIX);
     GameMode = (int*)(ModuleBase + ADDR_GAME_MODE);
     LocalPlayer = *((AcEntity**)(ModuleBase + ADDR_ENTITY_LOCALPLAYER));
     EntityList = *((AcEntityList**)(ModuleBase + ADDR_ENTITY_LIST));
     PlayerCount = (int*)(ModuleBase + ADDR_NUM_PLAYERS);
-
     Log::Debug() << "AcState::UpdateAttributes(): Done ..." << Log::Endl;
 }

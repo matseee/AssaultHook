@@ -69,7 +69,7 @@ DWORD __stdcall Thread(HMODULE hModule) {
 		MenuEntry{ "Unl. Health", new Health() },
 		MenuEntry{ "Unl. Ammo",
 			new Patch(
-				(addr)(acState->ModuleBase + ADDR_DECREASE_AMMO_FUNCTION),
+				(addr)acState->DecreaseAmmo,
 				(addr)"\x90\x90", // ac_client.exe+C73EF - 90 90    - nop
 				(addr)"\xFF\x08", // ac_client.exe+C73EF - FF 08    - dec[eax]
 				2

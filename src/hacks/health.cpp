@@ -5,7 +5,7 @@
 // .text:0041C226 mov     eax, esi		- 8B C6
 
 DWORD LocalPlayerState;
-DWORD JmpBackHealthHook = ADDR_DECREASE_HEALTH_INSTRUCTION + 5;
+DWORD JmpBackHealthHook = NULL;
 
 void _declspec(naked) HealthHook() {
 	__asm {
@@ -20,7 +20,8 @@ void _declspec(naked) HealthHook() {
 }
 
 Health::Health() : Hack() {
-	m_DoDamageHook = new memory::Hook(ADDR_DECREASE_HEALTH_INSTRUCTION, (addr)HealthHook, 5);
+	m_DoDamageHook = new memory::Hook(m_AcState->DecreaseHealth, (addr)HealthHook, 5);
+	JmpBackHealthHook = m_AcState->DecreaseHealth + 5;
 }
 
 Health::~Health() {

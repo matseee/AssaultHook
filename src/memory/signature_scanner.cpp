@@ -10,9 +10,7 @@ bool memory::SignatureScanner::Scan(Signature* signature) {
 	return ScanMemory(m_ModuleBaseAddress, m_ModuleBaseAddress + m_ModuleSize, signature, 1);
 }
 
-bool memory::SignatureScanner::ScanMulti(Signature signatures[]) {
-	uint signatureCount = sizeof(*signatures) / sizeof(Signature);
-
+bool memory::SignatureScanner::ScanMulti(Signature signatures[], uint signatureCount) {
 	for (uint i = 0; i < signatureCount; ++i) {
 		signatures[i].patternLength = strlen(signatures[i].pattern);
 	}

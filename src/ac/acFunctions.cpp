@@ -4,7 +4,7 @@
 // of the first intersection with a world object. We can use this function to check if a player is behind a wall (or other object) or not.
 // int __fastcall IntersectGeometry(float* a1, int WorldPos) <= at 0x004CCA80
 void AcIntersectGeometry(const vec& from, vec& to) {
-	DWORD fIntersectGeometry = ADDR_INTERSECTGEOMETRY_FUNCTION;
+	DWORD fIntersectGeometry = AcState::Get()->IntersectGeometry;
 
 	void* pFrom = (void*)&from;
 	void* pTo = (void*)&to;
@@ -20,7 +20,7 @@ void AcIntersectGeometry(const vec& from, vec& to) {
 // Function but It only searches for the first player in the "line". It only recognizes PhysEnts and none other game objects...
 // int __usercall IntersectClosest@<eax>(int to@<edx>, int at, float* bestdistsquared, _DWORD* hitzone, char aAiming) <= at 0x004CA250
 AcEntity* AcIntersectClosest(const vec& from, const vec& to, const AcEntity* at, float& bestdistsquared, int& hitzone, bool aiming) {
-	DWORD fIntersectClosest = ADDR_INTERSECTCLOSEST_FUNCTION;
+	DWORD fIntersectClosest = AcState::Get()->IntersectGeometry;
 	AcEntity* pResultEntity = nullptr;
 
 	void* pHitzone = &hitzone;
