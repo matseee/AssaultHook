@@ -1,4 +1,6 @@
 src/Debug/
+src/x64/Debug/
 src/Release/
+src/x64/Release/
 .vs/
 *i64

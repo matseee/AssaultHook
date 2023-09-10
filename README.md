@@ -21,7 +21,6 @@ After the AssaultHook-DLL is injected into the game, a new thread is created. In
 - [ ] signature scanning
 - [ ] detours with assembly for unl. ammo and no recoil
 - [ ] fov aimbot
-- [ ] dll injector
 
 ## Used tools
 - [IDA Free](https://hex-rays.com/ida-free/)
