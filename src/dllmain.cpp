@@ -9,8 +9,6 @@
 #include "hacks/memhack.h"
 #include "hacks/esp.h"
 
-#include "ac/acAddresses.h"
-#include "ac/acStructs.h"
 #include "ac/acState.h"
 
 const char titleAssaultHook[] = ">> AssaultHook <<";
