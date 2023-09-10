@@ -8,7 +8,7 @@ typedef unsigned char	byte;	// single byte
 typedef unsigned int	uint;	// unsigned int
 typedef unsigned long	ulong;	// unsigned long
 
-// defined undepending from arch
+// defined independing from arch
 #define MEMORY_ASM_INSTRUCTION_NOP 0x90
 
 // defines dependening of arch
