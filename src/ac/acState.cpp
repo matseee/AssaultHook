@@ -40,6 +40,7 @@ bool AcState::IsReady() {
 void AcState::Setup() {
     LoadModules();
     UpdateAttributes();
+    ScanForSignatures();
     Log::Debug() << "AcState::Setup(): Done ..." << Log::Endl;
 }
 
@@ -73,6 +74,28 @@ void AcState::LoadModules() {
     }
     Log::Debug() << "AcState::LoadModules(): GetModuleHandle(\"ac_client.exe\") => 0x" << (void*)ModuleBase << Log::Endl;
 }
+
+bool AcState::ScanForSignatures() {
+    MODULEINFO moduleInfo = {};
+    GetModuleInformation(GetCurrentProcess(), (HMODULE)ModuleBase, &moduleInfo, sizeof(moduleInfo));
+    if (!moduleInfo.SizeOfImage) {
+        Log::Error() << "AcState::ScanForSignatures(): Could not evaluate module size ..." << Log::Endl;
+        return false;
+    }
+
+    memory::Signature sig{"\x83\xEC\x28\x53\x55\x8B\x6C","xxxxxxx",};
+	memory::SignatureScanner* scanner = new memory::SignatureScanner(ModuleBase, moduleInfo.SizeOfImage);
+    
+    if (!scanner->Scan(&sig)) {
+        Log::Error() << "AcState::ScanForSignatures() : Could not find signature for NoRecoil function ..." << Log::Endl;
+        return false;
+    }
+
+    Log::Info() << "AcState::ScanForSignatures(): Found NoRecoil signature at 0x" << (void*)sig.address << " ..." << Log::Endl;
+    NoRecoil = sig.address;
+    return true;
+}
+
 
 void AcState::UpdateAttributes() {
     if (!CheckReady()) {

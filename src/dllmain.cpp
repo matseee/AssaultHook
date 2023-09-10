@@ -2,7 +2,6 @@
 #include "menu/menu.h"
 
 #include "memory/trampoline_hook.h"
-#include "memory/memory.h"
 
 #include "hacks/aimbot.h"
 #include "hacks/health.h"
@@ -79,7 +78,7 @@ DWORD __stdcall Thread(HMODULE hModule) {
 		MenuEntry{ "No Recoil",
 			// instead of running the original calculateRecoil function, return directly
 			new Patch(
-				(addr)(acState->ModuleBase + ADDR_NORECOIL_FUNCTION),
+				(addr)acState->NoRecoil,
 				(addr)"\xC2\x08\x00", // ac_client.exe+C8BA0 - C2 08 00    - ret 0008 { 8 }
 				(addr)"\x83\xEC\x28", // ac_client.exe+C8BA0 - 83 EC 28    - sub esp,28
 				3

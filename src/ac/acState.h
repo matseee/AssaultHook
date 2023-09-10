@@ -1,10 +1,12 @@
 #pragma once
 #include <Windows.h>
+#include <Psapi.h>
 #include <iostream>
 #include "../utils/log.h"
 #include "acAddresses.h"
 #include "acStructs.h"
 #include "../memory/memory.h"
+#include "../memory/signature_scanner.h"
 
 class AcState
 {
@@ -20,6 +22,7 @@ public:
 	bool IsValidEntity(AcEntity* entity);
 
 	addr ModuleBase = NULL;
+	addr NoRecoil = NULL;
 
 	int* GameMode = nullptr;
 	int* PlayerCount = nullptr;
@@ -34,6 +37,7 @@ protected:
 	void Setup();
 	bool CheckReady();
 	void LoadModules();
+	bool ScanForSignatures();
 
 	static AcState* Instance;
 };
