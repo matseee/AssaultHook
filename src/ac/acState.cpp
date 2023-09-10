@@ -28,6 +28,12 @@ AcState::~AcState() {
     PlayerCount = nullptr;
 
     ModuleBase = NULL;
+
+	NoRecoil = NULL;
+	DecreaseAmmo = NULL;
+	DecreaseHealth = NULL;
+	IntersectClosest = NULL;
+	IntersectGeometry = NULL;
 }
 
 bool AcState::IsReady() {
@@ -84,11 +90,16 @@ bool AcState::ScanForSignatures() {
     }
 
     memory::Signature signatures[] = {
-		memory::Signature { "\x83\xEC\x28\x53\x55\x8B\x6C","xxxxxxx", },                                // sigNoRecoil
-		memory::Signature { "\xFF\x08\x8D\x44\x24\x1C", "xxxxxx", },                                    // sigDecreaseAmmo
-		memory::Signature { "\x29\x73\x04\x8B\xC6", "xxxxx", },                                         // sigDecreaseHealth
-		memory::Signature { "\x83\xEC\x1C\xA1\x00\xAC\x58\x00", "xxxxxxxx", },                          // sigIntersectClosest
-		memory::Signature { "\x55\x8B\xEC\x83\xE4\xF8\x81\xEC\x34\x01\x00\x00\x53", "xxxxxxxxxxxxx", }, // sigIntersectGeometry
+        // sigNoRecoil
+		memory::Signature { "\x83\xEC\x00\x53\x55\x8B\x6C\x00\x00\x56\x57\x8B\xF9", "xx?xxxx??xxxx", },
+		// sigDecreaseAmmo
+		memory::Signature { "\xFF\x08\x8D\x44", "xxxx", },
+        // sigDecreaseHealth
+		memory::Signature { "\x2B\xF1\x29\x73", "xxxx", 2 },
+        // sigIntersectClosest
+		memory::Signature { "\x83\xEC\x00\xA1\x00\x00\x00\x00\x00\x00\x00\x00\x24", "xx?x????????x", },
+        // sigIntersectGeometry
+		memory::Signature { "\x55\x8B\xEC\x83\xE4\x00\x81\xEC\x00\x00\x00\x00\x53\x8B\xDA\x8B\xD1", "xxxxx?xx????xxxxx", }, 
     };
 
 	memory::SignatureScanner* scanner = new memory::SignatureScanner(ModuleBase, moduleInfo.SizeOfImage);

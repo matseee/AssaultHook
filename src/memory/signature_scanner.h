@@ -5,6 +5,7 @@ namespace memory {
 	struct Signature {
 		const char* pattern;
 		const char* mask;
+		uint relevantByte = NULL;
 		uint patternLength = NULL;
 		addr address = NULL;
 	};

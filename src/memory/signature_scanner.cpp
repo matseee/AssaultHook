@@ -12,7 +12,7 @@ bool memory::SignatureScanner::Scan(Signature* signature) {
 
 bool memory::SignatureScanner::ScanMulti(Signature signatures[], uint signatureCount) {
 	for (uint i = 0; i < signatureCount; ++i) {
-		signatures[i].patternLength = strlen(signatures[i].pattern);
+		signatures[i].patternLength = strlen(signatures[i].mask);
 	}
 
 	return ScanMemory(m_ModuleBaseAddress, m_ModuleBaseAddress + m_ModuleSize, signatures, signatureCount);
@@ -22,10 +22,8 @@ bool memory::SignatureScanner::ScanMemory(addr fromAddress, addr toAddress, Sign
 	uint searchRangeSize = toAddress - fromAddress;
 	uint signatureComplete = 0;
 
-	// TODO: Check if it is enough space left inside the module
-
-	for (uint memoryIndex = 0; memoryIndex < searchRangeSize; ++memoryIndex) {
-		for (uint signatureIndex = 0; signatureIndex < signatureCount; ++signatureIndex) {
+	for (uint memoryIndex = 0; memoryIndex < searchRangeSize; memoryIndex++) {
+		for (uint signatureIndex = 0; signatureIndex < signatureCount; signatureIndex++) {
 			if (signatures[signatureIndex].address != NULL) {
 				continue;
 			}
@@ -43,14 +41,16 @@ bool memory::SignatureScanner::ScanMemory(addr fromAddress, addr toAddress, Sign
 }
 
 bool memory::SignatureScanner::CheckSignature(addr address, Signature* signature) {
-	for (uint signatureIndex = 0; signatureIndex < signature->patternLength; ++signatureIndex) {
-		if (signature->mask[signatureIndex] != '?'
-			&& signature->pattern[signatureIndex] != *(char*)(address + signatureIndex)) {
+	for (uint signatureIndex = 0; signatureIndex < signature->patternLength; signatureIndex++) {
+		if (signature->mask[signatureIndex] == '?') {
+			continue;
+		}
+		if(signature->pattern[signatureIndex] != *(char*)(address + signatureIndex)) {
 			return false;
 		}
 	}
 
-	signature->address = address;
+	signature->address = address + signature->relevantByte;
 	return true;
 }
 
