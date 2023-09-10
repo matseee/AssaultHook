@@ -5,29 +5,23 @@ namespace memory {
 	struct Signature {
 		const char* pattern;
 		const char* mask;
-		uint patternLength = 0;
-		addr address = 0;
+		uint patternLength = NULL;
+		addr address = NULL;
 	};
 
 	class SignatureScanner {
 	public:
-		SignatureScanner(addr moduleBaseAddress, uint moduleSize)
-			: SignatureScanner(moduleBaseAddress, moduleSize, 4096, 1) {};
-		SignatureScanner(addr moduleBaseAddress, uint moduleSize, uint chunkSize)
-			: SignatureScanner(moduleBaseAddress, moduleSize, chunkSize, 1) {};
-		SignatureScanner(addr moduleBaseAddress, uint moduleSize, uint chunkSize, uint multiScanThreadCount);
+		SignatureScanner(addr moduleBaseAddress, uint moduleSize);
 		~SignatureScanner() {};
 
 		bool Scan(Signature* signature);
 		bool ScanMulti(Signature signature[]);
 
 	protected:
-		bool ScanMemory(addr from, addr to, Signature* signature);
-		uint GetChunkCount();
+		bool ScanMemory(addr from, addr to, Signature signature[], uint signatureCount);
+		bool CheckSignature(addr address, Signature* signature);
 
 		addr m_ModuleBaseAddress;
 		uint m_ModuleSize;
-		uint m_ChunkSize;
-		uint m_MultiScanThreadCount;
 	};
 }
