@@ -13,9 +13,8 @@
 #include "ac/acStructs.h"
 #include "ac/acState.h"
 
+const char titleAssaultHook[] = ">> AssaultHook <<";
 bool bDestroy = false;
-HMODULE hThread = nullptr;
-const char titleAssaultHook[] = " >> AssaultHook <<";
 
 AcState* acState = nullptr;
 Menu* menu = nullptr;
@@ -48,10 +47,8 @@ BOOL __stdcall HookedWglSwapBuffers(HDC hDc) {
 }
 
 // Main thread of assaulthook. It creates the Log-, AcState-, Menu(its entries,
-// including the hacks)- and the trampolinehook-object/s.
+// including the hacks) and the trampolinehook.
 DWORD __stdcall Thread(HMODULE hModule) {
-	hThread = hModule;
-
 	Log::SetActive(true);
 	Log::Info() << titleAssaultHook << Log::Endl;
 	Log::Info() << "DllMain::Thread(): Initialization started ..." << Log::Endl;
@@ -121,7 +118,7 @@ DWORD __stdcall Thread(HMODULE hModule) {
 	Sleep(200);
 
 	// exit thread and unload dll
-	FreeLibraryAndExitThread((HINSTANCE)hThread, 0);
+	FreeLibraryAndExitThread((HINSTANCE)hModule, 0);
 	return 0;
 }
 
