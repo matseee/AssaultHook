@@ -1,13 +1,28 @@
 #pragma once
+#include <sstream>
+#include <iostream>
+#include <vector>
 #include "memory.h"
+
+#define MEMORY_SIGNATURE_WILDCARD_BYTE 0xFF
+#define MEMORY_SIGNATURE_MAX_SIZE 255
 
 namespace memory {
 	struct Signature {
 		const char* pattern;
-		const char* mask;
-		uint relevantByte = NULL;
-		uint patternLength = NULL;
+		uint addressByteOffset;
 		addr address = NULL;
+		
+		uint length = NULL;
+		char bytes[MEMORY_SIGNATURE_MAX_SIZE] = {};
+		char byteMask[MEMORY_SIGNATURE_MAX_SIZE] = {};
+
+		Signature(const char* pattern) : Signature(pattern, NULL) {};
+		Signature(const char* pattern, uint addressByteOffset);
+
+	private:
+		void addByte(uint byte, char mask);
+		uint decode(const char* input);
 	};
 
 	class SignatureScanner {

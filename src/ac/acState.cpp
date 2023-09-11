@@ -91,15 +91,15 @@ bool AcState::ScanForSignatures() {
 
     memory::Signature signatures[] = {
         // sigNoRecoil
-		memory::Signature { "\x83\xEC\x00\x53\x55\x8B\x6C\x00\x00\x56\x57\x8B\xF9", "xx?xxxx??xxxx", },
+		memory::Signature { "83 EC ? 53 55 8B 6C ? ? 56 57 8B F9", },
 		// sigDecreaseAmmo
-		memory::Signature { "\xFF\x08\x8D\x44", "xxxx", },
+		memory::Signature { "FF 08 8D 44", },
         // sigDecreaseHealth
-		memory::Signature { "\x2B\xF1\x29\x73", "xxxx", 2 },
+		memory::Signature { "2B F1 29 73", 2 },
         // sigIntersectClosest
-		memory::Signature { "\x83\xEC\x00\xA1\x00\x00\x00\x00\x00\x00\x00\x00\x24", "xx?x????????x", },
+		memory::Signature { "83 EC ? A1 ? ? ? ? ? ? ? ? 24", },
         // sigIntersectGeometry
-		memory::Signature { "\x55\x8B\xEC\x83\xE4\x00\x81\xEC\x00\x00\x00\x00\x53\x8B\xDA\x8B\xD1", "xxxxx?xx????xxxxx", }, 
+		memory::Signature { "55 8B EC 83 E4 ? 81 EC ? ? ? ? 53 8B DA 8B D1", }, 
     };
 
 	memory::SignatureScanner* scanner = new memory::SignatureScanner(ModuleBase, moduleInfo.SizeOfImage);
