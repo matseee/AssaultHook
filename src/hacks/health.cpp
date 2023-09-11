@@ -9,13 +9,13 @@ DWORD JmpBackHealthHook = NULL;
 
 void _declspec(naked) HealthHook() {
     __asm {
-        cmp ebx, [LocalPlayerState];	// compare current this-pointer with LocalPlayerState
-        jne is_bot;						// if not equal: jump over the next instruction
-        mov esi, 0;						// else set damage (esi) to 0
+        cmp ebx, [LocalPlayerState];    // compare current this-pointer with LocalPlayerState
+        jne is_bot;                     // if not equal: jump over the next instruction
+        mov esi, 0;                     // else set damage (esi) to 0
     is_bot:
-        sub[ebx + 4], esi;				// execute the stolen bytes
+        sub[ebx + 4], esi;              // execute the stolen bytes
         mov eax, esi;
-        jmp JmpBackHealthHook;			// jump back to original function
+        jmp JmpBackHealthHook;          // jump back to original function
     }
 }
 
