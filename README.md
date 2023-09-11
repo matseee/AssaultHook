@@ -18,7 +18,6 @@ This project includes a visual studio solution that contains two projects. The `
 | No recoil | overwrite instructions: instead of calculate the recoil just return directly |
 
 #### next features
-- [ ] signature scanning
 - [ ] detours with assembly for unl. ammo and no recoil
 - [ ] fov aimbot
 
