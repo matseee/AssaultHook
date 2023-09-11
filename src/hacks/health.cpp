@@ -8,43 +8,43 @@ DWORD LocalPlayerState;
 DWORD JmpBackHealthHook = NULL;
 
 void _declspec(naked) HealthHook() {
-	__asm {
-		cmp ebx, [LocalPlayerState]		// compare current this-pointer with LocalPlayerState
-		jne is_bot						// if not equal: jump over the next instruction
-		mov esi, 0						// else set damage (esi) to 0
-		is_bot:
-		sub[ebx + 4], esi				// execute the stolen bytes
-		mov eax, esi
-		jmp JmpBackHealthHook			// jump back to original function
-	}
+    __asm {
+        cmp ebx, [LocalPlayerState];	// compare current this-pointer with LocalPlayerState
+        jne is_bot;						// if not equal: jump over the next instruction
+        mov esi, 0;						// else set damage (esi) to 0
+    is_bot:
+        sub[ebx + 4], esi;				// execute the stolen bytes
+        mov eax, esi;
+        jmp JmpBackHealthHook;			// jump back to original function
+    }
 }
 
 Health::Health() : Hack() {
-	m_DoDamageHook = new memory::Hook(m_AcState->DecreaseHealth, (addr)HealthHook, 5);
-	JmpBackHealthHook = m_AcState->DecreaseHealth + 5;
+    m_DoDamageHook = new memory::Hook(m_AcState->DecreaseHealth, (addr)HealthHook, 5);
+    JmpBackHealthHook = m_AcState->DecreaseHealth + 5;
 }
 
 Health::~Health() {
-	this->Deactivate();
+    this->Deactivate();
 }
 
 void Health::Activate() {
-	if (this->IsActive()) {
-		return;
-	}
-	m_IsActive = m_DoDamageHook->Activate();
+    if (this->IsActive()) {
+        return;
+    }
+    m_IsActive = m_DoDamageHook->Activate();
 }
 
 void Health::Deactivate() {
-	if (!this->IsActive()) {
-		return;
-	}
-	m_IsActive = !m_DoDamageHook->Deactivate();
+    if (!this->IsActive()) {
+        return;
+    }
+    m_IsActive = !m_DoDamageHook->Deactivate();
 }
 
 void Health::Tick() {
-	if (!this->m_AcState->IsReady()) {
-		return;
-	}
-	LocalPlayerState = ((ulong)&this->m_AcState->LocalPlayer->Health) - 4;
+    if (!this->m_AcState->IsReady()) {
+        return;
+    }
+    LocalPlayerState = ((ulong)&this->m_AcState->LocalPlayer->Health) - 4;
 }

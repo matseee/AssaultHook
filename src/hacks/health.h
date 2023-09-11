@@ -4,13 +4,13 @@
 
 class Health : public Hack {
 public:
-	Health();
-	~Health();
+    Health();
+    ~Health();
 
-	void Activate();
-	void Deactivate();
-	void Tick();
+    void Activate();
+    void Deactivate();
+    void Tick();
 
 protected:
-	memory::Hook* m_DoDamageHook;
+    memory::Hook* m_DoDamageHook;
 };

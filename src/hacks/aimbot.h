@@ -6,14 +6,14 @@
 
 class Aimbot : public Hack {
 public:
-	void Tick();
+    void Tick();
 
 protected:
-	AcEntity* GetBestEntity();
+    AcEntity* GetBestEntity();
 
-	void AimToEntity(AcEntity* entity);
-	geometry::Vector3 CalcAngle(AcEntity* entity);
-	
-	bool IsVisible(AcEntity* entity);
+    void AimToEntity(AcEntity* entity);
+    geometry::Vector3 CalcAngle(AcEntity* entity);
+
+    bool IsVisible(AcEntity* entity);
 };
 

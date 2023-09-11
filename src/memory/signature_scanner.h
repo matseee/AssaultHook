@@ -8,36 +8,36 @@
 #define MEMORY_SIGNATURE_MAX_SIZE 255
 
 namespace memory {
-	struct Signature {
-		const char* pattern;
-		uint addressByteOffset;
-		addr address = NULL;
-		
-		uint length = NULL;
-		char bytes[MEMORY_SIGNATURE_MAX_SIZE] = {};
-		char byteMask[MEMORY_SIGNATURE_MAX_SIZE] = {};
+    struct Signature {
+        const char* pattern;
+        uint addressByteOffset;
+        addr address = NULL;
 
-		Signature(const char* pattern) : Signature(pattern, NULL) {};
-		Signature(const char* pattern, uint addressByteOffset);
+        uint length = NULL;
+        char bytes[MEMORY_SIGNATURE_MAX_SIZE] = {};
+        char byteMask[MEMORY_SIGNATURE_MAX_SIZE] = {};
 
-	private:
-		void AddByte(uint byte, char mask);
-		uint Decode(const char* input);
-	};
+        Signature(const char* pattern) : Signature(pattern, NULL) {};
+        Signature(const char* pattern, uint addressByteOffset);
 
-	class SignatureScanner {
-	public:
-		SignatureScanner(addr moduleBaseAddress, uint moduleSize);
-		~SignatureScanner() {};
+    private:
+        void AddByte(uint byte, char mask);
+        uint Decode(const char* input);
+    };
 
-		bool Scan(Signature* signature);
-		bool ScanMulti(Signature signatures[], uint signatureCount);
+    class SignatureScanner {
+    public:
+        SignatureScanner(addr moduleBaseAddress, uint moduleSize);
+        ~SignatureScanner() {};
 
-	protected:
-		bool ScanMemory(addr from, addr to, Signature signature[], uint signatureCount);
-		bool CheckSignature(addr address, Signature* signature);
+        bool Scan(Signature* signature);
+        bool ScanMulti(Signature signatures[], uint signatureCount);
 
-		addr m_ModuleBaseAddress;
-		uint m_ModuleSize;
-	};
+    protected:
+        bool ScanMemory(addr from, addr to, Signature signature[], uint signatureCount);
+        bool CheckSignature(addr address, Signature* signature);
+
+        addr m_ModuleBaseAddress;
+        uint m_ModuleSize;
+    };
 }

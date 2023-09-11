@@ -8,7 +8,7 @@ AcState* AcState::Get() {
         AcState::Instance = new AcState();
         Log::Debug() << "AcState::Get(): Creation done ..." << Log::Endl;
     }
-	return AcState::Instance;
+    return AcState::Instance;
 }
 
 void AcState::Destroy() {
@@ -29,11 +29,11 @@ AcState::~AcState() {
 
     ModuleBase = NULL;
 
-	NoRecoil = NULL;
-	DecreaseAmmo = NULL;
-	DecreaseHealth = NULL;
-	IntersectClosest = NULL;
-	IntersectGeometry = NULL;
+    NoRecoil = NULL;
+    DecreaseAmmo = NULL;
+    DecreaseHealth = NULL;
+    IntersectClosest = NULL;
+    IntersectGeometry = NULL;
 }
 
 bool AcState::IsReady() {
@@ -54,18 +54,18 @@ bool AcState::CheckReady() {
 }
 
 bool AcState::IsTeamGame() {
-	int* gameMode = GameMode;
-	return *gameMode == 0 || *gameMode == 4 || *gameMode == 5 || *gameMode == 7 
-		|| *gameMode == 11 || *gameMode == 13 || *gameMode == 14 || *gameMode == 16 
-		|| *gameMode == 17 || *gameMode == 20 || *gameMode == 21;
+    int* gameMode = GameMode;
+    return *gameMode == 0 || *gameMode == 4 || *gameMode == 5 || *gameMode == 7
+        || *gameMode == 11 || *gameMode == 13 || *gameMode == 14 || *gameMode == 16
+        || *gameMode == 17 || *gameMode == 20 || *gameMode == 21;
 }
 
 bool AcState::IsEnemy(AcEntity* entity) {
-	return !IsTeamGame() || entity->Team != LocalPlayer->Team;
+    return !IsTeamGame() || entity->Team != LocalPlayer->Team;
 }
 
 bool AcState::IsValidEntity(AcEntity* entity) {
-	return entity && entity->Health > 0;
+    return entity && entity->Health > 0;
 }
 
 void AcState::LoadModules() {
@@ -86,15 +86,15 @@ bool AcState::ScanForSignatures() {
 
     memory::Signature signatures[] = {
         // sigNoRecoil
-		memory::Signature { "83 EC ? 53 55 8B 6C ? ? 56 57 8B F9", },
+        memory::Signature { "83 EC ? 53 55 8B 6C ? ? 56 57 8B F9", },
         // sigDecreaseAmmo
-		memory::Signature { "FF 08 8D 44", },
+        memory::Signature { "FF 08 8D 44", },
         // sigDecreaseHealth
-		memory::Signature { "2B F1 29 73", 2 },
+        memory::Signature { "2B F1 29 73", 2 },
         // sigIntersectClosest
-		memory::Signature { "83 EC ? A1 ? ? ? ? ? ? ? ? 24", },
+        memory::Signature { "83 EC ? A1 ? ? ? ? ? ? ? ? 24", },
         // sigIntersectGeometry
-		memory::Signature { "55 8B EC 83 E4 ? 81 EC ? ? ? ? 53 8B DA 8B D1", }, 
+        memory::Signature { "55 8B EC 83 E4 ? 81 EC ? ? ? ? 53 8B DA 8B D1", },
 
         // sigGameMode
         memory::Signature { "89 15 ? ? ? ? 53", 2 },
@@ -108,7 +108,7 @@ bool AcState::ScanForSignatures() {
         memory::Signature { "8B 0D ? ? ? ? 46 3B ? 7C ? 8B 35", 2 },
     };
 
-	memory::SignatureScanner* scanner = new memory::SignatureScanner(ModuleBase, moduleInfo.SizeOfImage);
+    memory::SignatureScanner* scanner = new memory::SignatureScanner(ModuleBase, moduleInfo.SizeOfImage);
     if (!scanner->ScanMulti(signatures, (sizeof(signatures) / sizeof(memory::Signature)))) {
         Log::Error() << "AcState::ScanForSignatures() : Could not find all signatures ..." << Log::Endl;
         return false;
@@ -122,13 +122,13 @@ bool AcState::ScanForSignatures() {
 
     Log::Info() << "AcState::ScanForSignatures(): Found DecreaseHealth signature at 0x" << (void*)signatures[2].address << " ..." << Log::Endl;
     DecreaseHealth = signatures[2].address;
-    
+
     Log::Info() << "AcState::ScanForSignatures(): Found IntersectClosest signature at 0x" << (void*)signatures[3].address << " ..." << Log::Endl;
     IntersectClosest = signatures[3].address;
-    
+
     Log::Info() << "AcState::ScanForSignatures(): Found IntersectGeometry signature at 0x" << (void*)signatures[4].address << " ..." << Log::Endl;
     IntersectGeometry = signatures[4].address;
-    
+
     Log::Info() << "AcState::ScanForSignatures(): Found GameMode signature at 0x" << (void*)signatures[5].address << " ..." << Log::Endl;
     GameMode = (int*)(*(addr*)signatures[5].address);
 

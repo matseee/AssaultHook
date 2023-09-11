@@ -6,17 +6,17 @@ DWORD GetProcessIdentifier(const char* processName) {
     HANDLE processList = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
     PROCESSENTRY32 entry;
     entry.dwSize = sizeof(entry);
-    
+
     if (!Process32First(processList, &entry)) {
         return NULL;
     }
 
-	do {
-		if (!_stricmp(entry.szExeFile, processName)) {
-			CloseHandle(processList);
-			return entry.th32ProcessID;
-		}
-	} while(Process32Next(processList, &entry));
+    do {
+        if (!_stricmp(entry.szExeFile, processName)) {
+            CloseHandle(processList);
+            return entry.th32ProcessID;
+        }
+    } while (Process32Next(processList, &entry));
 
     return NULL;
 }
@@ -27,21 +27,21 @@ bool InjectDLL(DWORD processIdentifier, const char* pathToDll) {
         std::cout << "InjectDll(): Could not open process with identifier \"" << process << "\"" << std::endl;
         return false;
     }
-        
-	uintptr_t* allocation = (uintptr_t*)VirtualAllocEx(process, 0, MAX_PATH, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
+
+    uintptr_t* allocation = (uintptr_t*)VirtualAllocEx(process, 0, MAX_PATH, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
     if (!allocation) {
         std::cout << "InjectDll(): Allocation of memory inside the targeted process failed ..." << std::endl;
         return false;
     }
 
-	WriteProcessMemory(process, allocation, pathToDll, strlen(pathToDll) + 1, NULL);
-		
-	HANDLE thread = CreateRemoteThread(process, NULL, NULL, (LPTHREAD_START_ROUTINE)LoadLibraryA, allocation, NULL, NULL);
-	if (!thread) {
-		return false;
-	}
+    WriteProcessMemory(process, allocation, pathToDll, strlen(pathToDll) + 1, NULL);
 
-	CloseHandle(thread);
+    HANDLE thread = CreateRemoteThread(process, NULL, NULL, (LPTHREAD_START_ROUTINE)LoadLibraryA, allocation, NULL, NULL);
+    if (!thread) {
+        return false;
+    }
+
+    CloseHandle(thread);
     return true;
 }
 
@@ -59,7 +59,8 @@ int main() {
     std::cout << "Injecting DLL ..." << std::endl;
     if (InjectDLL(ac_client, pathToDll)) {
         std::cout << "AssaultHook-Injection succesfully ..." << std::endl;
-    } else {
+    }
+    else {
         std::cout << "AssaultHook-Injection failed ..." << std::endl;
     }
 

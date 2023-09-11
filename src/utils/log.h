@@ -6,43 +6,42 @@
 #include "hex.h"
 
 enum LogLevel {
-	LOG_DEBUG,
-	LOG_INFO,
-	LOG_WARNING,
-	LOG_ERROR
+    LOG_DEBUG,
+    LOG_INFO,
+    LOG_WARNING,
+    LOG_ERROR
 };
 
-class Log
-{
+class Log {
 public:
-	static std::ostream& Print(LogLevel level);
-	static std::ostream& Debug() { return Log::Print(LOG_DEBUG); };
-	static std::ostream& Info() { return Log::Print(LOG_INFO); };
-	static std::ostream& Warning() { return Log::Print(LOG_WARNING); };
-	static std::ostream& Error() { return Log::Print(LOG_ERROR); };
+    static std::ostream& Print(LogLevel level);
+    static std::ostream& Debug() { return Log::Print(LOG_DEBUG); };
+    static std::ostream& Info() { return Log::Print(LOG_INFO); };
+    static std::ostream& Warning() { return Log::Print(LOG_WARNING); };
+    static std::ostream& Error() { return Log::Print(LOG_ERROR); };
 
-	static std::ostream& Endl(std::ostream& ostream);
+    static std::ostream& Endl(std::ostream& ostream);
 
-	static void Bytes(byte* bytes, unsigned int length); 
+    static void Bytes(byte* bytes, unsigned int length);
 
-	static void SetActive(bool active);
-	static void Destroy();
+    static void SetActive(bool active);
+    static void Destroy();
 
 protected:
-	Log();
-	~Log();
-	
-	static void CreateIfNotExist();
+    Log();
+    ~Log();
 
-	static void AllocateConsole();
-	static void DeallocateConsole();
+    static void CreateIfNotExist();
 
-	static std::string GetTimestamp();
-	static std::string LogLevelToString(LogLevel l);
+    static void AllocateConsole();
+    static void DeallocateConsole();
 
-	static Log* Instance;
+    static std::string GetTimestamp();
+    static std::string LogLevelToString(LogLevel l);
 
-	static bool IsActive;
-	static FILE* ConsoleStream;
-	static std::ofstream NullStream;
+    static Log* Instance;
+
+    static bool IsActive;
+    static FILE* ConsoleStream;
+    static std::ofstream NullStream;
 };
