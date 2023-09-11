@@ -7,14 +7,14 @@ memory::Signature::Signature(const char* pattern, uint addressByteOffset) {
 	for (uint i = 0, charLength = 0; pattern[i] != '\0'; i++) {
 		if (pattern[i] == ' ') {
 			continue;
-		} else if (pattern[i] == '?') {
-			addByte(MEMORY_SIGNATURE_WILDCARD_BYTE, '?');
-			charLength = 0;
-		} else {
-			charLength++;
-		}
+		} 
 
-		if (charLength == 2) {
+		if (pattern[i] == '?') {
+			addByte(MEMORY_SIGNATURE_WILDCARD_BYTE, '?');
+			continue;
+		} 
+
+		if (++charLength == 2) {
 			addByte(decode(pattern + i - 1), 'x');
 			charLength = 0;
 		}
