@@ -64,7 +64,6 @@ void ESPBase::Tick() {
 void ESPBase::LoopOverEntities() {
 	if (!this->m_AcState->EntityList || !this->m_AcState->EntityList->Entities) {
 		Log::Warning() << "ESPBase::LoopOverEntities(): \"m_AcState->EntityList\" not available ..." << Log::Endl;
-		this->m_AcState->UpdateAttributes();
 		return;
 	}
 

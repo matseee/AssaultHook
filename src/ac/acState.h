@@ -15,7 +15,6 @@ public:
 	static void Destroy();
 
 	bool IsReady();
-	void UpdateAttributes();
 
 	bool IsTeamGame();
 	bool IsEnemy(AcEntity* entity);

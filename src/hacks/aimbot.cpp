@@ -16,7 +16,6 @@ void Aimbot::Tick() {
 AcEntity* Aimbot::GetBestEntity() {
 	if (!m_AcState->EntityList || !m_AcState->EntityList->Entities) {
 		Log::Warning() << "Aimbot::GetBestEntity(): \"m_AcState->EntityList\" not available ..." << Log::Endl;
-		m_AcState->UpdateAttributes();
 		return nullptr;
 	}
 

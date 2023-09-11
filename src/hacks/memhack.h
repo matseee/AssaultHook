@@ -14,16 +14,16 @@ public:
         Deactivate();
         m_Address = NULL;
         m_Value = NULL;
-	    m_AcState = nullptr;
+        m_AcState = nullptr;
     }
 
     inline void Tick() {
-		if (!IsActive()) {
-			return;
-		}
+        if (!IsActive()) {
+            return;
+        }
 
         T* typedValue = reinterpret_cast<T*>(m_Address);
-		*typedValue = m_Value;
+        *typedValue = m_Value;
     };
 
 protected:

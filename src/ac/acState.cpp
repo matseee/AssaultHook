@@ -45,7 +45,6 @@ bool AcState::IsReady() {
 
 void AcState::Setup() {
     LoadModules();
-    UpdateAttributes();
     ScanForSignatures();
     Log::Debug() << "AcState::Setup(): Done ..." << Log::Endl;
 }
@@ -56,12 +55,9 @@ bool AcState::CheckReady() {
 
 bool AcState::IsTeamGame() {
 	int* gameMode = GameMode;
-	return *gameMode == 0 || *gameMode == 4 
-		|| *gameMode == 5 || *gameMode == 7 
-		|| *gameMode == 11 || *gameMode == 13 
-		|| *gameMode == 14 || *gameMode == 16 
-		|| *gameMode == 17 || *gameMode == 20 
-		|| *gameMode == 21;
+	return *gameMode == 0 || *gameMode == 4 || *gameMode == 5 || *gameMode == 7 
+		|| *gameMode == 11 || *gameMode == 13 || *gameMode == 14 || *gameMode == 16 
+		|| *gameMode == 17 || *gameMode == 20 || *gameMode == 21;
 }
 
 bool AcState::IsEnemy(AcEntity* entity) {
@@ -69,8 +65,7 @@ bool AcState::IsEnemy(AcEntity* entity) {
 }
 
 bool AcState::IsValidEntity(AcEntity* entity) {
-	return entity && entity->VTable == ADDR_ENTITY_VTABLE_TO_COMPARE
-		&& entity->Health > 0;
+	return entity && entity->Health > 0;
 }
 
 void AcState::LoadModules() {
@@ -92,7 +87,7 @@ bool AcState::ScanForSignatures() {
     memory::Signature signatures[] = {
         // sigNoRecoil
 		memory::Signature { "83 EC ? 53 55 8B 6C ? ? 56 57 8B F9", },
-		// sigDecreaseAmmo
+        // sigDecreaseAmmo
 		memory::Signature { "FF 08 8D 44", },
         // sigDecreaseHealth
 		memory::Signature { "2B F1 29 73", 2 },
@@ -100,6 +95,17 @@ bool AcState::ScanForSignatures() {
 		memory::Signature { "83 EC ? A1 ? ? ? ? ? ? ? ? 24", },
         // sigIntersectGeometry
 		memory::Signature { "55 8B EC 83 E4 ? 81 EC ? ? ? ? 53 8B DA 8B D1", }, 
+
+        // sigGameMode
+        memory::Signature { "89 15 ? ? ? ? 53", 2 },
+        // sigMatrix
+        memory::Signature { "F3 0F ? ? ? ? ? ? F3 0F ? ? 0F 28 ? 0F C6 C3 ? F3 0F ? ? ? ? ? ? F3 0F ? ? F3 0F ? ? F2 0F ? ? ? ? ? ? 0F 28 ? 0F 54 ? ? ? ? ? 0F 5A ? 66 0F ? ? 77 ? F3 0F", 4 },
+        // sigLocalPlayer
+        memory::Signature { "8B 0D ? ? ? ? 56 57 8B 3D", 2 },
+        // sigEntityList
+        memory::Signature { "A1 ? ? ? ? ? ? ? ? F6 0F 84 5F", 1 },
+        // sigPlayerCount
+        memory::Signature { "8B 0D ? ? ? ? 46 3B ? 7C ? 8B 35", 2 },
     };
 
 	memory::SignatureScanner* scanner = new memory::SignatureScanner(ModuleBase, moduleInfo.SizeOfImage);
@@ -122,20 +128,21 @@ bool AcState::ScanForSignatures() {
     
     Log::Info() << "AcState::ScanForSignatures(): Found IntersectGeometry signature at 0x" << (void*)signatures[4].address << " ..." << Log::Endl;
     IntersectGeometry = signatures[4].address;
+    
+    Log::Info() << "AcState::ScanForSignatures(): Found GameMode signature at 0x" << (void*)signatures[5].address << " ..." << Log::Endl;
+    GameMode = (int*)(*(addr*)signatures[5].address);
+
+    Log::Info() << "AcState::ScanForSignatures(): Found Matrix signature at 0x" << (void*)signatures[6].address << " ..." << Log::Endl;
+    Matrix = (float*)(*(addr*)signatures[6].address);
+
+    Log::Info() << "AcState::ScanForSignatures(): Found LocalPlayer signature at 0x" << (void*)signatures[7].address << " ..." << Log::Endl;
+    LocalPlayer = *(AcEntity**)(*(addr*)signatures[7].address);
+
+    Log::Info() << "AcState::ScanForSignatures(): Found EntityList signature at 0x" << (void*)signatures[8].address << " ..." << Log::Endl;
+    EntityList = *(AcEntityList**)(*(addr*)signatures[8].address);
+
+    Log::Info() << "AcState::ScanForSignatures(): Found PlayerCount signature at 0x" << (void*)signatures[9].address << " ..." << Log::Endl;
+    PlayerCount = (int*)(*(addr*)signatures[9].address);
     return true;
 }
 
-
-void AcState::UpdateAttributes() {
-    if (!CheckReady()) {
-        Log::Warning() << "AcState::UpdateAttributes(): Not ready! Returned without updating attributes ..." << Log::Endl;
-        return;
-    }
-
-    Matrix = (float*)(ADDR_MATRIX);
-    GameMode = (int*)(ModuleBase + ADDR_GAME_MODE);
-    LocalPlayer = *((AcEntity**)(ModuleBase + ADDR_ENTITY_LOCALPLAYER));
-    EntityList = *((AcEntityList**)(ModuleBase + ADDR_ENTITY_LIST));
-    PlayerCount = (int*)(ModuleBase + ADDR_NUM_PLAYERS);
-    Log::Debug() << "AcState::UpdateAttributes(): Done ..." << Log::Endl;
-}

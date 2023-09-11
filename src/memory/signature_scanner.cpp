@@ -10,24 +10,24 @@ memory::Signature::Signature(const char* pattern, uint addressByteOffset) {
 		} 
 
 		if (pattern[i] == '?') {
-			addByte(MEMORY_SIGNATURE_WILDCARD_BYTE, '?');
+			AddByte(MEMORY_SIGNATURE_WILDCARD_BYTE, '?');
 			continue;
 		} 
 
 		if (++charLength == 2) {
-			addByte(decode(pattern + i - 1), 'x');
+			AddByte(Decode(pattern + i - 1), 'x');
 			charLength = 0;
 		}
 	}
 }
 
-void memory::Signature::addByte(uint byte, char mask) {
+void memory::Signature::AddByte(uint byte, char mask) {
 	bytes[length] = byte;
 	byteMask[length] = mask;
 	length++;
 }
 
-uint memory::Signature::decode(const char* input) {
+uint memory::Signature::Decode(const char* input) {
 	uint out, i, t, hn, ln;
 	for (t = 0, i = 0; i < 2; i += 2, ++t) {
 		hn = input[i] > '9' ? input[i] - 'A' + 10 : input[i] - '0';

@@ -1,8 +1,8 @@
 #pragma once
 #include "hack.h"
-#include "../utils/log.h"
 #include "../ac/acFunctions.h"
 #include "../geometry/geometry.h"
+#include "../utils/log.h"
 
 class Aimbot : public Hack {
 public:

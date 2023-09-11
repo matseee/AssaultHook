@@ -21,8 +21,8 @@ namespace memory {
 		Signature(const char* pattern, uint addressByteOffset);
 
 	private:
-		void addByte(uint byte, char mask);
-		uint decode(const char* input);
+		void AddByte(uint byte, char mask);
+		uint Decode(const char* input);
 	};
 
 	class SignatureScanner {
