@@ -1,5 +1,6 @@
 #include <Windows.h>
 #include <iostream>
+#include <filesystem>
 #include <tlhelp32.h>
 
 DWORD GetProcessIdentifier(const char* processName) {
@@ -47,7 +48,7 @@ bool InjectDLL(DWORD processIdentifier, const char* pathToDll) {
 
 int main() {
     const char* processName = "ac_client.exe";
-    const char* pathToDll = "D:\\sonstige\\source\\repos\\AssaultHook\\src\\Debug\\AssaultHook.dll";
+    std::filesystem::path pathToDLL = std::filesystem::current_path() / "AssaultHook.dll";
 
     std::cout << "Looking for \"ac_client.exe\" ..." << std::endl;
     DWORD ac_client = NULL;
@@ -57,7 +58,7 @@ int main() {
     }
 
     std::cout << "Injecting DLL ..." << std::endl;
-    if (InjectDLL(ac_client, pathToDll)) {
+    if (InjectDLL(ac_client, pathToDLL.string().c_str())) {
         std::cout << "AssaultHook-Injection succesfully ..." << std::endl;
     }
     else {

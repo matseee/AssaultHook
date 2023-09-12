@@ -141,7 +141,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="ac\acAddresses.h" />
     <ClInclude Include="ac\acFunctions.h" />
     <ClInclude Include="ac\acState.h" />
     <ClInclude Include="ac\acStructs.h" />
