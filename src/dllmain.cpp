@@ -85,6 +85,7 @@ DWORD __stdcall Thread(HMODULE hModule) {
             )
             },
             MenuEntry{ "", nullptr, MenuEntryType::SPACER },
+            MenuEntry{ "Rescan Signatures", new Hack(false, [](bool active) { if (active) AcState::Get()->Reload(); }) },
             MenuEntry{ "Debug Log",
                 new Hack(true, [](bool active) { Log::SetActive(active); })
         }

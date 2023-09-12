@@ -11,6 +11,12 @@ AcState* AcState::Get() {
     return AcState::Instance;
 }
 
+void AcState::Reload() {
+    if (AcState::Instance) {
+        AcState::Instance->ScanForSignatures();
+    }
+}
+
 void AcState::Destroy() {
     delete AcState::Instance;
     Log::Debug() << "AcState::Destroy(): \"AcState::Instance\" destroyed ..." << Log::Endl;

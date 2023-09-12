@@ -10,6 +10,7 @@
 class AcState {
 public:
     static AcState* Get();
+    static void Reload();
     static void Destroy();
 
     bool IsReady();
