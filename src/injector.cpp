@@ -4,6 +4,16 @@
 
 #include "memory/memory.h"
 
+#ifdef _LINUX
+bool InjectLibrary(uint processIdentifier, const char* pathToLibrary) {
+
+    return true;
+}
+
+const char* PROCESS = "ac_client";
+const char* FILENAME = "AssaultHook.so";
+#endif
+
 #ifdef _WINDOWS
 bool InjectLibrary(DWORD processIdentifier, const char* pathToLibrary) {
     HANDLE process = OpenProcess(PROCESS_ALL_ACCESS, NULL, processIdentifier);
@@ -31,16 +41,6 @@ bool InjectLibrary(DWORD processIdentifier, const char* pathToLibrary) {
 
 const char* PROCESS = "ac_client.exe";
 const char* FILENAME = "AssaultHook.dll";
-#endif
-
-#ifdef _LINUX
-bool InjectLibrary(uint processIdentifier, const char* pathToLibrary) {
-
-    return true;
-}
-
-const char* PROCESS = "ac_client";
-const char* FILENAME = "AssaultHook.so";
 #endif
 
 int main() {

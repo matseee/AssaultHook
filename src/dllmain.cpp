@@ -55,7 +55,7 @@ DWORD __stdcall Thread(HMODULE hModule) {
     AcState* acState = AcState::Get();
     while (!acState->IsReady()) {
         Log::Warning() << "DllMain::Thread(): AcState not ready ... trying again ..." << Log::Endl;
-        Sleep(50);
+        SysWait(50);
     }
 
     menu = new Menu(std::vector<MenuEntry> {
@@ -103,11 +103,11 @@ DWORD __stdcall Thread(HMODULE hModule) {
     Log::Info() << "DllMain::Thread(): Initialization finished ..." << Log::Endl;
 
     while (!bDestroy) {
-        Sleep(200);
+        SysWait(200);
     }
 
     Log::Info() << "DllMain::Thread(): Destroying allocated resources ..." << Log::Endl;
-    Sleep(200);
+    SysWait(200);
 
     // delete assaulthook objects
     delete menu;
@@ -115,7 +115,7 @@ DWORD __stdcall Thread(HMODULE hModule) {
     AcState::Destroy();
     Log::Destroy();
 
-    Sleep(200);
+    SysWait(200);
 
     // exit thread and unload dll
     FreeLibraryAndExitThread((HINSTANCE)hModule, 0);

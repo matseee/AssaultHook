@@ -18,13 +18,13 @@ public:
     bool IsEnemy(AcEntity* entity);
     bool IsValidEntity(AcEntity* entity);
 
-    addr ModuleBase = NULL;
+    addr ModuleBase = 0;
 
-    addr NoRecoil = NULL;
-    addr DecreaseAmmo = NULL;
-    addr DecreaseHealth = NULL;
-    addr IntersectClosest = NULL;
-    addr IntersectGeometry = NULL;
+    addr NoRecoil = 0;
+    addr DecreaseAmmo = 0;
+    addr DecreaseHealth = 0;
+    addr IntersectClosest = 0;
+    addr IntersectGeometry = 0;
 
     int* GameMode = nullptr;
     int* PlayerCount = nullptr;

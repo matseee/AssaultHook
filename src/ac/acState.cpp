@@ -1,5 +1,13 @@
 #include "acState.h"
 
+#ifdef _LINUX
+const char* MODULE_NAME = "ac_client";
+#endif
+
+#ifdef _WINDOWS
+const char* MODULE_NAME = "ac_client.exe";
+#endif
+
 AcState* AcState::Instance;
 
 AcState* AcState::Get() {
@@ -75,11 +83,11 @@ bool AcState::IsValidEntity(AcEntity* entity) {
 }
 
 void AcState::LoadModules() {
-    ModuleBase = memory::GetModuleBaseAddress("ac_client.exe");
+    ModuleBase = memory::GetModuleBaseAddress(MODULE_NAME);
     if (!ModuleBase) {
-        Log::Error() << "AcState::LoadModules(): Could not get \"ac_client.exe\" module handle ..." << Log::Endl;
+        Log::Error() << "AcState::LoadModules(): Could not get \"ac_client\" module handle ..." << Log::Endl;
     }
-    Log::Debug() << "AcState::LoadModules(): GetModuleHandle(\"ac_client.exe\") => 0x" << (void*)ModuleBase << Log::Endl;
+    Log::Debug() << "AcState::LoadModules(): GetModuleHandle(\"ac_client\") => 0x" << (void*)ModuleBase << Log::Endl;
 }
 
 bool AcState::ScanForSignatures() {

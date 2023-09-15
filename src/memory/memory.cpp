@@ -39,6 +39,21 @@ uint memory::GetProcessIdentifier(const char* processName) {
     return pid;
 }
 
+addr memory::GetModuleBaseAddress(const char* moduleName) { return 0; }
+
+uint memory::GetModuleSize(addr moduleBaseAddress) { return 0; }
+
+addr memory::AllocateMemory(addr source, uint size) { return 0; }
+
+bool memory::FreeMemory(addr source) { return true; }
+
+bool memory::PatchBytes(addr* destination, addr* source, uint size) { return false; }
+
+bool memory::ReadBytes(addr* source, addr* destination, uint size) { return false; }
+
+bool memory::NopBytes(addr* destination, uint size) { return false; }
+
+addr memory::FindDMAAddress(addr baseAddress, std::vector<uint> offsets) { return 0; }
 #endif
 
 #ifdef _WINDOWS

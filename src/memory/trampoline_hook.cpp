@@ -10,7 +10,7 @@ memory::TrampolineHook::TrampolineHook(addr sourceAddress, addr destinationAddre
     m_SourceAddress = sourceAddress;
     m_DestinationAddress = destinationAddress;
     m_Length = length;
-    m_GatewayAddress = NULL;
+    m_GatewayAddress = 0;
 
     if (!CheckAllowed()) {
         return;

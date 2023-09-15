@@ -1,5 +1,5 @@
 #pragma once
-#include <Windows.h>
+#include "../system.h"
 #include "defines.h"
 #include "memory.h"
 

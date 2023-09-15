@@ -84,7 +84,7 @@ bool memory::Hook::Create() {
 #ifdef _WIN64
     // windows 64bit: we have to do an absolute jmp to the destination address
     // absolute JMP instruction + absolute address
-    * (addr*)(bInstruction + 8) = m_DestinationAddress;
+    *(addr*)(bInstruction + 8) = m_DestinationAddress;
 
     Log::Debug() << "Hook::Create(): Write JMP to 0x" << (void*)m_DestinationAddress << " instruction into 0x" << (void*)source << " => ";
     Log::Bytes(bInstruction, m_Length);

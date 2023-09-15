@@ -10,6 +10,17 @@ typedef unsigned char	byte;	// single byte
 typedef unsigned int	uint;	// unsigned int
 typedef unsigned long	ulong;	// unsigned long
 
+// includes for any unix like system
+#ifdef _LINUX
+#include <sys/types.h>
+#include <string.h>
+#include <dirent.h>
+
+inline void SysWait(uint milliseconds) {
+   // CALL LINUX SLEEP FUNCTION
+}
+#endif
+
 // includes for a windows system (win10, win11)
 #ifdef _WINDOWS
 #include <Windows.h>
@@ -22,13 +33,3 @@ inline void SysWait(uint milliseconds) {
 }
 #endif
 
-// includes for any unix like system
-#ifdef _LINUX
-#include <sys/types.h>
-#include <string.h>
-#include <dirent.h>
-
-inline void SysWait(uint milliseconds) {
-   // CALL LINUX SLEEP FUNCTION
-}
-#endif
