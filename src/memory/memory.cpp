@@ -40,13 +40,10 @@ uint memory::GetProcessIdentifier(const char* processName) {
 
 	    std::stringstream cmdline;
 	    cmdline << cmdlineFS.rdbuf();
-
-	    int found = cmdline.str().find(processName);
-	    if (found != std::string::npos) {
+	    if (cmdline.str().find(processName) != std::string::npos) {
                 pid = id;
-	    	cmdlineFS.close();
-		break;
 	    }
+
 	    cmdlineFS.close();
 	}
     }
