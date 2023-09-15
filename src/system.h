@@ -1,8 +1,13 @@
 #pragma once
 #include <stdint.h>
+#include <vector>
+#include <sstream>
+#include <fstream>
+#include <iostream>
 
 // active operating system
 #define _LINUX 0x1
+// #define _WINDOWS 0x1
 
 // types for both operating systems
 typedef uintptr_t	addr;	// pointer address
@@ -12,12 +17,19 @@ typedef unsigned long	ulong;	// unsigned long
 
 // includes for any unix like system
 #ifdef _LINUX
+#include <stdlib.h>
 #include <sys/types.h>
 #include <string.h>
+#include <strings.h>
 #include <dirent.h>
+#include <time.h>
 
 inline void SysWait(uint milliseconds) {
-   // CALL LINUX SLEEP FUNCTION
+    timespec sleepSpec{
+	0,
+	((long)milliseconds) * 1000 * 1000,
+    };
+    nanosleep(&sleepSpec, 0);
 }
 #endif
 

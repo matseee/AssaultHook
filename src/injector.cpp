@@ -10,7 +10,7 @@ bool InjectLibrary(uint processIdentifier, const char* pathToLibrary) {
     return true;
 }
 
-const char* PROCESS = "ac_client";
+const char* PROCESS = "linux_64_client";
 const char* FILENAME = "AssaultHook.so";
 #endif
 
@@ -53,7 +53,7 @@ int main() {
         SysWait(100);
     }
 
-    std::cout << "Injecting Library ..." << std::endl;
+    std::cout << "Injecting Library to process " << ac_client << " ..." << std::endl;
     if (InjectLibrary(ac_client, pathToLibrary.string().c_str())) {
         std::cout << "AssaultHook-Injection succesfully ..." << std::endl;
     }

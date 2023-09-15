@@ -1,6 +1,4 @@
 #pragma once
-#include "../system.h"
-
 
 // defined independing from arch
 #define MEMORY_ASM_INSTRUCTION_NOP 0x90

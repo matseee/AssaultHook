@@ -1,7 +1,25 @@
 #include "memory.h"
 
 #ifdef _LINUX
+addr memory::GetModuleBaseAddress(const char* moduleName) { return 0; }
+
+uint memory::GetModuleSize(addr moduleBaseAddress) { return 0; }
+
+addr memory::AllocateMemory(addr source, uint size) { return 0; }
+
+bool memory::FreeMemory(addr source) { return true; }
+
+bool memory::PatchBytes(addr* destination, addr* source, uint size) { return false; }
+
+bool memory::ReadBytes(addr* source, addr* destination, uint size) { return false; }
+
+bool memory::NopBytes(addr* destination, uint size) { return false; }
+
+addr memory::FindDMAAddress(addr baseAddress, std::vector<uint> offsets) { return 0; }
+#endif
+
 uint memory::GetProcessIdentifier(const char* processName) {
+#ifdef _LINUX
     uint pid = 0;
     DIR* pDirectory = opendir("/proc");
     if (!pDirectory) {
@@ -23,41 +41,20 @@ uint memory::GetProcessIdentifier(const char* processName) {
 	    std::stringstream cmdline;
 	    cmdline << cmdlineFS.rdbuf();
 
-	    size_t processNamePosition = cmdline.str().rfind('/') + 1;
-	    std::string currentProcessName = cmdline.str().substr(processNamePosition);
-
-	    cmdlineFS.close();
-
-	    if (!strcmp(processName, currentProcessName.c_str())) {
+	    int found = cmdline.str().find(processName);
+	    if (found != std::string::npos) {
                 pid = id;
+	    	cmdlineFS.close();
 		break;
 	    }
+	    cmdlineFS.close();
 	}
     }
 
     closedir(pDirectory);
     return pid;
-}
-
-addr memory::GetModuleBaseAddress(const char* moduleName) { return 0; }
-
-uint memory::GetModuleSize(addr moduleBaseAddress) { return 0; }
-
-addr memory::AllocateMemory(addr source, uint size) { return 0; }
-
-bool memory::FreeMemory(addr source) { return true; }
-
-bool memory::PatchBytes(addr* destination, addr* source, uint size) { return false; }
-
-bool memory::ReadBytes(addr* source, addr* destination, uint size) { return false; }
-
-bool memory::NopBytes(addr* destination, uint size) { return false; }
-
-addr memory::FindDMAAddress(addr baseAddress, std::vector<uint> offsets) { return 0; }
 #endif
-
 #ifdef _WINDOWS
-uint memory::GetProcessIdentifier(const char* processName) {
     HANDLE processList = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
     PROCESSENTRY32 entry;
     entry.dwSize = sizeof(entry);
@@ -74,8 +71,10 @@ uint memory::GetProcessIdentifier(const char* processName) {
     } while (Process32Next(processList, &entry));
 
     return NULL;
+#endif
 }
 
+#ifdef _WINDOWS
 addr memory::GetModuleBaseAddress(const char* moduleName) {
     return (addr)GetModuleHandle(moduleName);
 }

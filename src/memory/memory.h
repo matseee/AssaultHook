@@ -1,9 +1,6 @@
 #pragma once
 #include "../system.h"
-#include <vector>
 #include "defines.h"
-
-#include "../utils/log.h"
 
 namespace memory {
     uint GetProcessIdentifier(const char* processName);
