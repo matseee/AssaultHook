@@ -1,6 +1,5 @@
 #pragma once
-#include <Windows.h>
-#include <Psapi.h>
+#include "../system.h"
 #include <iostream>
 #include "acStructs.h"
 #include "../utils/log.h"

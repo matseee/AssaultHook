@@ -56,7 +56,7 @@ bool memory::SignatureScanner::ScanMemory(addr fromAddress, addr toAddress, Sign
 
     for (uint memoryIndex = 0; memoryIndex < searchRangeSize; memoryIndex++) {
         for (uint signatureIndex = 0; signatureIndex < signatureCount; signatureIndex++) {
-            if (signatures[signatureIndex].address != NULL) {
+            if (signatures[signatureIndex].address != 0) {
                 continue;
             }
 

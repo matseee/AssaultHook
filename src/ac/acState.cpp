@@ -33,13 +33,13 @@ AcState::~AcState() {
     EntityList = nullptr;
     PlayerCount = nullptr;
 
-    ModuleBase = NULL;
+    ModuleBase = 0;
 
-    NoRecoil = NULL;
-    DecreaseAmmo = NULL;
-    DecreaseHealth = NULL;
-    IntersectClosest = NULL;
-    IntersectGeometry = NULL;
+    NoRecoil = 0;
+    DecreaseAmmo = 0;
+    DecreaseHealth = 0;
+    IntersectClosest = 0;
+    IntersectGeometry = 0;
 }
 
 bool AcState::IsReady() {
@@ -75,7 +75,7 @@ bool AcState::IsValidEntity(AcEntity* entity) {
 }
 
 void AcState::LoadModules() {
-    ModuleBase = (addr)GetModuleHandle(L"ac_client.exe");
+    ModuleBase = memory::GetModuleBaseAddress("ac_client.exe");
     if (!ModuleBase) {
         Log::Error() << "AcState::LoadModules(): Could not get \"ac_client.exe\" module handle ..." << Log::Endl;
     }
@@ -83,9 +83,8 @@ void AcState::LoadModules() {
 }
 
 bool AcState::ScanForSignatures() {
-    MODULEINFO moduleInfo = {};
-    GetModuleInformation(GetCurrentProcess(), (HMODULE)ModuleBase, &moduleInfo, sizeof(moduleInfo));
-    if (!moduleInfo.SizeOfImage) {
+    uint sizeOfModule = memory::GetModuleSize(ModuleBase);
+    if (!sizeOfModule) {
         Log::Error() << "AcState::ScanForSignatures(): Could not evaluate module size ..." << Log::Endl;
         return false;
     }
@@ -114,7 +113,7 @@ bool AcState::ScanForSignatures() {
         memory::Signature { "8B 0D ? ? ? ? 46 3B ? 7C ? 8B 35", 2 },
     };
 
-    memory::SignatureScanner* scanner = new memory::SignatureScanner(ModuleBase, moduleInfo.SizeOfImage);
+    memory::SignatureScanner* scanner = new memory::SignatureScanner(ModuleBase, sizeOfModule);
     if (!scanner->ScanMulti(signatures, (sizeof(signatures) / sizeof(memory::Signature)))) {
         Log::Error() << "AcState::ScanForSignatures() : Could not find all signatures ..." << Log::Endl;
         return false;

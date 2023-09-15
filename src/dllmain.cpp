@@ -1,3 +1,5 @@
+#include "system.h"
+
 #include "utils/log.h"
 #include "menu/menu.h"
 

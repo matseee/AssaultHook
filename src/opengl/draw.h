@@ -1,8 +1,7 @@
 #pragma once
 #pragma comment(lib, "OpenGL32.lib")
-#include <Windows.h>
+#include "../system.h"
 #include <stdio.h>
-#include <gl\GL.h>
 
 #include "../geometry/geometry.h"
 

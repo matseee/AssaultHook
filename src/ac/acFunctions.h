@@ -1,5 +1,6 @@
 #pragma once
-#include <Windows.h>
+#include "../system.h"
+
 #include "acState.h"
 #include "acStructs.h"
 

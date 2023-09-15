@@ -1,12 +1,6 @@
 #pragma once
-#include <Windows.h>
+#include "../system.h"
 
-// type aliases - to be "independend" from windows 
-// and be easily able to switch to linux
-typedef uintptr_t		addr;	// pointer address
-typedef unsigned char	byte;	// single byte
-typedef unsigned int	uint;	// unsigned int
-typedef unsigned long	ulong;	// unsigned long
 
 // defined independing from arch
 #define MEMORY_ASM_INSTRUCTION_NOP 0x90

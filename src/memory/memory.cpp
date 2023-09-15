@@ -1,5 +1,80 @@
 #include "memory.h"
 
+#ifdef _LINUX
+uint memory::GetProcessIdentifier(const char* processName) {
+    uint pid = 0;
+    DIR* pDirectory = opendir("/proc");
+    if (!pDirectory) {
+	return 0;
+    }
+
+    struct dirent* pDirEntry;
+    while (pid == 0 && (pDirEntry = readdir(pDirectory))) {
+        uint id = (uint)atoi(pDirEntry->d_name);
+	if (id > 0) {
+            std::stringstream cmdlinePath;
+	    cmdlinePath << "/proc/" << id << "/cmdline";
+
+	    std::ifstream cmdlineFS(cmdlinePath.str(), std::ios::binary);
+	    if (!cmdlineFS.is_open()) {
+	        continue;
+	    }
+
+	    std::stringstream cmdline;
+	    cmdline << cmdlineFS.rdbuf();
+
+	    size_t processNamePosition = cmdline.str().rfind('/') + 1;
+	    std::string currentProcessName = cmdline.str().substr(processNamePosition);
+
+	    cmdlineFS.close();
+
+	    if (!strcmp(processName, currentProcessName.c_str())) {
+                pid = id;
+		break;
+	    }
+	}
+    }
+
+    closedir(pDirectory);
+    return pid;
+}
+
+#endif
+
+#ifdef _WINDOWS
+uint memory::GetProcessIdentifier(const char* processName) {
+    HANDLE processList = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+    PROCESSENTRY32 entry;
+    entry.dwSize = sizeof(entry);
+
+    if (!Process32First(processList, &entry)) {
+        return NULL;
+    }
+
+    do {
+        if (!_stricmp(entry.szExeFile, processName)) {
+            CloseHandle(processList);
+            return entry.th32ProcessID;
+        }
+    } while (Process32Next(processList, &entry));
+
+    return NULL;
+}
+
+addr memory::GetModuleBaseAddress(const char* moduleName) {
+    return (addr)GetModuleHandle(moduleName);
+}
+
+uint memory::GetModuleSize(addr moduleBaseAddress) {
+    MODULEINFO moduleInfo = {};
+    GetModuleInformation(GetCurrentProcess(), (HMODULE)moduleBaseAddress, &moduleInfo, sizeof(moduleInfo));
+
+    if (!moduleInfo || !moduleInfo.SizeOfImage) {
+        return 0;
+    }
+    return moduleInfo.SizeOfImage;
+}
+
 addr memory::AllocateMemory(addr source, uint size) {
     return (addr)VirtualAlloc((addr*)source, size, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
 }
@@ -52,3 +127,4 @@ addr memory::FindDMAAddress(addr baseAddress, std::vector<uint> offsets) {
     }
     return address;
 }
+#endif

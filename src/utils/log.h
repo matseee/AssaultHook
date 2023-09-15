@@ -1,8 +1,8 @@
 #pragma once
-#include <Windows.h>
 #include <iostream>
 #include <fstream>
 
+#include "../system.h"
 #include "hex.h"
 
 enum LogLevel {

@@ -1,28 +1,11 @@
-#include <Windows.h>
+#include "system.h"
 #include <iostream>
 #include <filesystem>
-#include <tlhelp32.h>
 
-DWORD GetProcessIdentifier(const char* processName) {
-    HANDLE processList = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
-    PROCESSENTRY32 entry;
-    entry.dwSize = sizeof(entry);
+#include "memory/memory.h"
 
-    if (!Process32First(processList, &entry)) {
-        return NULL;
-    }
-
-    do {
-        if (!_stricmp(entry.szExeFile, processName)) {
-            CloseHandle(processList);
-            return entry.th32ProcessID;
-        }
-    } while (Process32Next(processList, &entry));
-
-    return NULL;
-}
-
-bool InjectDLL(DWORD processIdentifier, const char* pathToDll) {
+#ifdef _WINDOWS
+bool InjectLibrary(DWORD processIdentifier, const char* pathToLibrary) {
     HANDLE process = OpenProcess(PROCESS_ALL_ACCESS, NULL, processIdentifier);
     if (!process || process == INVALID_HANDLE_VALUE) {
         std::cout << "InjectDll(): Could not open process with identifier \"" << process << "\"" << std::endl;
@@ -35,7 +18,7 @@ bool InjectDLL(DWORD processIdentifier, const char* pathToDll) {
         return false;
     }
 
-    WriteProcessMemory(process, allocation, pathToDll, strlen(pathToDll) + 1, NULL);
+    WriteProcessMemory(process, allocation, pathToLibrary, strlen(pathToLibrary) + 1, NULL);
 
     HANDLE thread = CreateRemoteThread(process, NULL, NULL, (LPTHREAD_START_ROUTINE)LoadLibraryA, allocation, NULL, NULL);
     if (!thread) {
@@ -46,25 +29,38 @@ bool InjectDLL(DWORD processIdentifier, const char* pathToDll) {
     return true;
 }
 
-int main() {
-    const char* processName = "ac_client.exe";
-    std::filesystem::path pathToDLL = std::filesystem::current_path() / "AssaultHook.dll";
+const char* PROCESS = "ac_client.exe";
+const char* FILENAME = "AssaultHook.dll";
+#endif
 
-    std::cout << "Looking for \"ac_client.exe\" ..." << std::endl;
-    DWORD ac_client = NULL;
+#ifdef _LINUX
+bool InjectLibrary(uint processIdentifier, const char* pathToLibrary) {
+
+    return true;
+}
+
+const char* PROCESS = "ac_client";
+const char* FILENAME = "AssaultHook.so";
+#endif
+
+int main() {
+    std::filesystem::path pathToLibrary = std::filesystem::current_path() / FILENAME;
+
+    std::cout << "Looking for \"ac_client\" ..." << std::endl;
+    uint ac_client = 0;
     while (!ac_client) {
-        ac_client = GetProcessIdentifier(processName);
-        Sleep(100);
+        ac_client = memory::GetProcessIdentifier(PROCESS);
+        SysWait(100);
     }
 
-    std::cout << "Injecting DLL ..." << std::endl;
-    if (InjectDLL(ac_client, pathToDLL.string().c_str())) {
+    std::cout << "Injecting Library ..." << std::endl;
+    if (InjectLibrary(ac_client, pathToLibrary.string().c_str())) {
         std::cout << "AssaultHook-Injection succesfully ..." << std::endl;
     }
     else {
         std::cout << "AssaultHook-Injection failed ..." << std::endl;
     }
 
-    Sleep(1000);
+    SysWait(1000);
     return 0;
 }

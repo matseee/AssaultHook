@@ -1,12 +1,15 @@
 #pragma once
-#include <windows.h>
+#include "../system.h"
 #include <vector>
+#include "defines.h"
 
 #include "../utils/log.h"
 
-#include "defines.h"
-
 namespace memory {
+    uint GetProcessIdentifier(const char* processName);
+    addr GetModuleBaseAddress(const char* moduleName);
+    uint GetModuleSize(addr moduleBaseAddress);
+
     addr AllocateMemory(addr source, uint size);
     bool FreeMemory(addr source);
 

@@ -11,13 +11,13 @@ namespace memory {
     struct Signature {
         const char* pattern;
         uint addressByteOffset;
-        addr address = NULL;
+        addr address = 0;
 
-        uint length = NULL;
+        uint length = 0;
         char bytes[MEMORY_SIGNATURE_MAX_SIZE] = {};
         char byteMask[MEMORY_SIGNATURE_MAX_SIZE] = {};
 
-        Signature(const char* pattern) : Signature(pattern, NULL) {};
+        Signature(const char* pattern) : Signature(pattern, 0) {};
         Signature(const char* pattern, uint addressByteOffset);
 
     private:
