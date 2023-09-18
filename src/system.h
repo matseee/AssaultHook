@@ -5,6 +5,19 @@
 #include <fstream>
 #include <iostream>
 
+#if defined(_M_IX86) || defined(__i386__) || __WORDSIZE == 32
+#define ARCH_86 /* The code is being compiled for 32 bits */
+#elif defined(_M_X64) || defined(__LP64__) || defined(_LP64) || __WORDSIZE == 64
+#define ARCH_64 /* The code is being compiled for 64 bits */
+#endif
+
+/* Helper macros */
+#if defined(ARCH_86)
+#define strtoptr(nptr, endptr, base) strtoul(nptr, endptr, base)
+#elif defined(ARCH_64)
+#define strtoptr(nptr, endptr, base) strtoull(nptr, endptr, base)
+#endif
+
 // active operating system
 #define _LINUX 0x1
 // #define _WINDOWS 0x1
