@@ -3,7 +3,7 @@ is an internal cheat for the game [AssaultCube](https://github.com/assaultcube/A
 
 This project includes a visual studio solution that contains two projects. The `Injector`-project is a very basic implementation of a dll injector that uses the function [`LoadLibraryA`](https://learn.microsoft.com/en-us/windows/win32/api/libloaderapi/nf-libloaderapi-loadlibrarya) to load the dll into AssaultCube. The `AssaultHook`-project is the internal cheat itself. After the AssaultHook-DLL is injected into the game, a new thread is created. In this thread the needed hack instances are created and the opengl function [`wglSwapBuffers`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-wglswaplayerbuffers) is hooked using a [trampoline function](http://jbremer.org/x86-api-hooking-demystified/#ah-trampoline). The cheat logic is then executed in the hooked function. The advantage of the `wglSwapBuffers` function is that it is called at the end of each rendered frame.
 
-![Screenshot](./img/screen.gif "screenshot")
+![Screenshot](./res/img/screen.gif "screenshot")
 
 ### features
 | feature | how its done |

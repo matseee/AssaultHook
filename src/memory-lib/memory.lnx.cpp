@@ -1,7 +1,6 @@
-#include "memory.h"
+#include "memory.lnx.h"
 
-uint memory::GetProcessIdentifier(const char *processName) {
-#ifdef _LINUX
+uint memory::lnx::GetProcessIdentifier(const char *processName) {
   uint pid = 0;
   DIR *pDirectory = opendir("/proc");
   if (!pDirectory) {
@@ -32,31 +31,12 @@ uint memory::GetProcessIdentifier(const char *processName) {
 
   closedir(pDirectory);
   return pid;
-#endif
-#ifdef _WINDOWS
-  HANDLE processList = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
-  PROCESSENTRY32 entry;
-  entry.dwSize = sizeof(entry);
-
-  if (!Process32First(processList, &entry)) {
-    return 0;
-  }
-
-  do {
-    if (!_stricmp(entry.szExeFile, processName)) {
-      CloseHandle(processList);
-      return entry.th32ProcessID;
-    }
-  } while (Process32Next(processList, &entry));
-
-  return 0;
-#endif
 }
 
-memory::Module memory::GetModule(const char *moduleName, uint pid) {
+memory::Module memory::lnx::GetModule(const char *moduleName, uint pid) {
   memory::Module module;
   module.PID = pid;
-#ifdef _LINUX
+
   long indexStart, indexEnd, tmpPos = 0;
 
   std::string moduleNameStr = std::string(moduleName);
@@ -132,101 +112,29 @@ memory::Module memory::GetModule(const char *moduleName, uint pid) {
   module.StartAddress = (addr)strtoptr(startAddress.c_str(), 0, 16);
   module.EndAddress = (addr)strtoptr(endAddress.c_str(), 0, 16);
   module.Size = module.EndAddress - module.StartAddress;
-#endif
-#ifdef _WINDOWS
-  module.StartAddress = (addr)GetModuleHandle(moduleName);
-  MODULEINFO moduleInfo = {};
-  GetModuleInformation(GetCurrentProcess(), (HMODULE)moduleBaseAddress,
-                       &moduleInfo, sizeof(moduleInfo));
-
-  if (!moduleInfo || !moduleInfo.SizeOfImage) {
-    module.Size = 0;
-  }
-  module.Size = moduleInfo.SizeOfImage;
-#endif
   return module;
 }
 
-addr memory::AllocateMemory(addr source, uint size) {
-#ifdef _LINUX
+addr memory::lnx::AllocateMemory(addr source, uint size) {
   return true;
-#endif
-#ifdef _WINDOWS
-  return (addr)VirtualAlloc((addr *)source, size, MEM_COMMIT | MEM_RESERVE,
-                            PAGE_EXECUTE_READWRITE);
-#endif
 }
 
-bool memory::FreeMemory(addr source) {
-#ifdef _LINUX
+bool memory::lnx::FreeMemory(addr source) {
   return true;
-#endif
-#ifdef _WINDOWS
-  return VirtualFree((addr *)source, 0, MEM_RELEASE) == 0;
-#endif
 }
 
-bool memory::PatchBytes(addr *destination, addr *source, uint size) {
-#ifdef _LINUX
+bool memory::lnx::PatchBytes(addr *destination, addr *source, uint size) {
   return true;
-#endif
-#ifdef _WINDOWS
-  ulong protection;
-  if (!VirtualProtect(destination, size, PAGE_EXECUTE_READWRITE, &protection)) {
-    return false;
-  }
-  if (memcpy_s((addr *)destination, size, source, size) != 0) {
-    return false;
-  }
-  return VirtualProtect(destination, size, protection, &protection);
-#endif
 }
 
-bool memory::ReadBytes(addr *source, addr *destination, uint size) {
-#ifdef _LINUX
+bool memory::lnx::ReadBytes(addr *source, addr *destination, uint size) {
   return true;
-#endif
-#ifdef _WINDOWS
-  ulong protection;
-  if (!VirtualProtect(source, size, PAGE_EXECUTE_READWRITE, &protection)) {
-    return false;
-  }
-  if (memcpy_s((addr *)destination, size, source, size) != 0) {
-    return false;
-  }
-  return VirtualProtect(source, size, protection, &protection);
-#endif
 }
 
-bool memory::NopBytes(addr *destination, uint size) {
-#ifdef _LINUX
+bool memory::lnx::NopBytes(addr *destination, uint size) {
   return true;
-#endif
-#ifdef _WINDOWS
-  ulong protection;
-  if (!VirtualProtect(destination, size, PAGE_EXECUTE_READWRITE, &protection)) {
-    return false;
-  }
-  memset(destination, MEMORY_ASM_INSTRUCTION_NOP, size);
-  return VirtualProtect(destination, size, protection, &protection) != 0;
-#endif
 }
 
-addr memory::FindDMAAddress(addr baseAddress, std::vector<uint> offsets) {
-#ifdef _LINUX
+addr memory::lnx::FindDMAAddress(addr baseAddress, std::vector<uint> offsets) {
   return 0;
-#endif
-#ifdef _WINDOWS
-  addr address = baseAddress;
-  for (uint i = 0; i < offsets.size(); ++i) {
-    address = *(addr *)address;
-
-    if (!address) {
-      return address;
-    }
-
-    address += offsets[i];
-  }
-  return address;
-#endif
 }
