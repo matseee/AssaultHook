@@ -10,6 +10,8 @@ struct Module {
   uint PID;
 };
 
+bool InjectSharedLibrary(const char* processName, const char* pathToLibrary);
+
 uint GetProcessIdentifier(const char *processName);
 Module GetModule(const char *moduleName, uint pid = 0);
 

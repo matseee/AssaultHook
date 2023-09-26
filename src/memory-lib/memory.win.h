@@ -5,6 +5,8 @@
 
 // windows implementation of memory functions
 namespace memory::win {
+bool InjectSharedLibrary(const char* processName, const char* pathToLibrary);
+
 uint GetProcessIdentifier(const char *processName);
 Module GetModule(const char *moduleName, uint pid = 0);
 

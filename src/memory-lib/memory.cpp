@@ -8,6 +8,14 @@
 #include "memory.win.h"
 #endif
 
+bool memory::InjectSharedLibrary(const char* processName, const char* pathToLibrary) {
+#ifdef _LINUX
+    return memory::lnx::InjectSharedLibrary(processName, pathToLibrary);
+#else
+    return memory::win::InjectSharedLibrary(processName, pathToLibrary);
+#endif
+}
+
 uint memory::GetProcessIdentifier(const char *processName) {
 #ifdef _LINUX
   return memory::lnx::GetProcessIdentifier(processName);
