@@ -58,10 +58,25 @@ uint memory::win::GetProcessIdentifier(const char *processName) {
   return 0;
 }
 
-memory::Module memory::win::GetModule(const char *moduleName, uint pid) {
+memory::Module memory::win::GetModule(const char *moduleName) {
+  memory::Module module;
+  module.StartAddress = (addr)GetModuleHandle(moduleName);
+
+  MODULEINFO moduleInfo = {};
+  GetModuleInformation(GetCurrentProcess(), (HMODULE)moduleBaseAddress,
+                       &moduleInfo, sizeof(moduleInfo));
+
+  if (!moduleInfo || !moduleInfo.SizeOfImage) {
+    module.Size = 0;
+  }
+  module.Size = moduleInfo.SizeOfImage;
+  return module;
+}
+
+memory::Module memory::win::GetModule(uint processIdentifier, const char *moduleName) {
   memory::Module module;
   module.PID = pid;
-  module.StartAddress = (addr)GetModuleHandle(moduleName);
+  module.StartAddress = (addr)GetModuleHandleEx(moduleName);
 
   MODULEINFO moduleInfo = {};
   GetModuleInformation(GetCurrentProcess(), (HMODULE)moduleBaseAddress,
